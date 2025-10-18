@@ -1,5 +1,5 @@
-# Voyagr – Travel Experience SharingVoyager
-### Voyagr is a web application that allows users to create, share, and explore travel experiences. Users can register for an account, log in, add trips, upload photos, and browse experiences by location or keyword. This is designed to make trips inspirational by showcasing engaging experiences.
+# Voyagr – Travel Experience Sharing 
+Voyagr is a web application that allows users to create, share, and explore travel experiences. Users can register for an account, log in, add trips, upload photos, and browse experiences by location or keyword. This is designed to make trips inspirational by showcasing engaging experiences.
 
 ## Tech Stack 
 - Frontend: ReactJS 
