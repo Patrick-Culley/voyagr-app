@@ -42,9 +42,35 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(201).json({ message: "The user is sucessfully registered", email: newUser.email });
     } else {
         res.status(400);
-        throw new Error("User data is not valid")
+        throw new Error("User data is not valid");
     };
-    res.json({ message: "Register the user "});
 });
 
-module.exports = { registerUser };
+// Login user
+// @route POST api/users/login
+// public access 
+const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("All fields are mandatory.");
+    };
+
+    /* for db use findOne()
+    */
+    const user = users.find(user => user.email === email);
+
+    /* compare hashedPassword with stored in db
+    Add function to generate access token
+    */
+    
+    if (user && user.password === password) {
+        console.log("Login is succesfull");
+        res.status(200).json({ message: "access token is here"});
+    } else {
+        res.status(401);
+        throw new Error("Email or password is not correct.");
+    };
+});
+
+module.exports = { registerUser, loginUser };
