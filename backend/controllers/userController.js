@@ -1,8 +1,5 @@
 const asyncHandler = require("express-async-handler");
-
-/* TEMP array to store users
- CHANGE to mongoDB model schema */
-const users = [];
+const User = require("../models/User");
 
 // Register a user
 // @route POST api/users/register
@@ -15,12 +12,8 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("All fields are mandatory!");
     }
     
-
-    /* Check if the user with the same email is already registered,
-    find in array for test. 
-    Change to mongoDB later:
-    const userAvailale = await users.findOne( { email }); */
-    const userAvailale = users.find(user => user.email === email);
+    // Check if the user with the same email is already registered
+    const userAvailale = await User.findOne( { email });
     if (userAvailale) {
         res.status(400);
         throw new Error("The user is already registered");
@@ -30,16 +23,23 @@ const registerUser = asyncHandler(async (req, res) => {
     function to hash password
     LATER to implement
     And save hashedPassword for new user
-    for mongoDB:
-    const user = await User.create({ username, email, password: hashedPassword });
     */
 
-    const newUser = { username, email, password};
-    users.push(newUser);
+    const newUser = await User.create({ 
+        username, 
+        email, 
+        password,
+        last_login: new Date()
+     });
 
-    console.log("User created:", newUser);
+    console.log(`User created: ${newUser}`);
     if (newUser) {
-        res.status(201).json({ message: "The user is sucessfully registered", email: newUser.email });
+        res.status(201).json({ 
+            message: "The user is sucessfully registered", 
+            _id: newUser._id,
+            username: newUser.username, 
+            email: newUser.email
+         });
     } else {
         res.status(400);
         throw new Error("User data is not valid");
@@ -56,9 +56,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new Error("All fields are mandatory.");
     };
 
-    /* for db use findOne()
-    */
-    const user = users.find(user => user.email === email);
+    const user = await User.findOne({ email });
 
     /* compare hashedPassword with stored in db
     Add function to generate access token
@@ -66,7 +64,17 @@ const loginUser = asyncHandler(async (req, res) => {
     
     if (user && user.password === password) {
         console.log("Login is succesfull");
-        res.status(200).json({ message: "access token is here"});
+        // update last login
+        user.last_login = new Date();
+        await user.save();
+        res.status(200).json({ 
+            message: "Login is succesfull",
+            user: {
+                id: user._id,
+                email: user.email,
+                username: user.username,
+                },
+            });
     } else {
         res.status(401);
         throw new Error("Email or password is not correct.");
