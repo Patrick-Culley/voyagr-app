@@ -16,7 +16,7 @@ Before running the project locally, make sure you have:
 - A MongoDB Atlas account & cluster access
 
 #### 1. Clone the Repository
-- `git clone https://github.com/<your-username>/voyagr-app.git`
+- `git clone https://github.com/Patrick-Culley/voyagr-app.git`
 - `cd voyagr-app/backend`
 #### 2. Install Dependencies
 - `nmp install`
