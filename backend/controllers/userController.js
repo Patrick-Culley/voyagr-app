@@ -66,6 +66,7 @@ const loginUser = asyncHandler(async (req, res) => {
         console.log("Login is succesfull");
         // update last login
         user.last_login = new Date();
+        await user.save();
         res.status(200).json({ 
             message: "Login is succesfull",
             user: {
