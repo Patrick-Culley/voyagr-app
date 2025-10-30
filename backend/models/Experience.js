@@ -12,6 +12,7 @@ const experienceSchema = new mongoose.Schema(
             type: String,
             required: true,
             maxlength: 50,
+            trim: true,
         },
 
         description: {
@@ -70,3 +71,6 @@ const experienceSchema = new mongoose.Schema(
         }
     }
 )
+
+const Experience = mongoose.model("Experience", experienceSchema);
+module.exports = Experience;
