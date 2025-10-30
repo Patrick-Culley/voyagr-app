@@ -7,8 +7,9 @@ function Trips() {
 
     // Mock data until schema gets merged into main repository
     const [trips, setTrips] = useState([
-        { user_id: 1, trip_name: "Bali, Thailand", trip_summary: "Tropical paradise!"},
-        { user_id: 2, trip_name: "Big Sur, California", trip_summary: "Mountainous adventure!"}
+        { user_id: 1, trip_name: "Bali, Indonesia", trip_summary: "Tropical paradise!"},
+        { user_id: 2, trip_name: "Big Sur, California", trip_summary: "Mountainous adventure!"},
+        { user_id: 3, trip_name: "Melbourne, Australia", trip_summary: "City life in the Gold Coast."}
         ]);
 
         const [showTripForm, setTripForm] = useState(false);            // Track pop-up is visible
@@ -30,8 +31,8 @@ function Trips() {
 
     return (
         <div className="container mt-4">
-            {/* CARD FOR TRIP NAME */}
             <div className="row">
+            {/* CARD FOR TRIP NAME */}
                 {trips.map((trip) => (
                     <div className="col-md-4 mb-4" key={trip.user_id}>
                         <div className="card h-100 shadow-sm"

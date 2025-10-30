@@ -7,6 +7,7 @@ function NavigationBar() {
         <div className="container">
             <Link className="navbar-brand" to="/">Voyagr</Link>
             <div className="navbar-nav me-auto">
+                {/* LINKS TO PAGES IN NAVIGATION BAR */}
                 <li className="nav-item">
                     <Link className="nav-link" to="/">Home</Link>
                 </li>
@@ -19,6 +20,7 @@ function NavigationBar() {
             </div>
         </div>
 
+        {/* SEARCH BAR */}
         <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" placeholder="Bon Voyage!" aria-label="Search"/>
             <button class="btn btn-outline-success" type="submit">Search</button>

@@ -7,10 +7,10 @@ import Trips from "./pages/myTrips"
 function App() {
   return (
     <Router>
-      {/* Navigation Bar */}
+      {/* NAVIGATION BAR */}
       <NavigationBar/>
 
-      {/* Pages */}
+      {/* PAGES */}
       <Routes>
         {/* <Route path="/" element={<Home/>} /> */}
         <Route path="/register" element={<UserRegistration/>} />
