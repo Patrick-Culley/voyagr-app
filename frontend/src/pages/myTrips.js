@@ -73,8 +73,8 @@ function Trips() {
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Tell us about it!</label>
-                                    <input
-                                    type="text"
+                                    <textarea
+                                    rows="5"
                                     className="form-control"
                                     value={addTripSummary}
                                     onChange={(e) => setAddTripSummary(e.target.value)} required/>
