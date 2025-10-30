@@ -8,6 +8,7 @@ function UserRegistration() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        {/* HANDLES FORM SUBMISSION FOR USER REGISTRATION. POST REQUEST SENT TO BACKEND. */}
         try{
             const response = await fetch("http://localhost:5555/api/users/register", {
               method: "POST",
@@ -37,6 +38,7 @@ function UserRegistration() {
 
     return (
         <div className="container d-flex justify-content-center" style={{marginTop: "200px"}}>
+        {/* USER REGISTRATION FORM: USERNAME, EMAIL, PASSWORD */}
         <div className="card p-4 shadow" style={{maxWidth: "400px"}}>
             <h1 className="mb-4 text-center">Create your account</h1>
             <form onSubmit={handleSubmit}>

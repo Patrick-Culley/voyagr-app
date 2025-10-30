@@ -26,6 +26,7 @@ function NavigationBar() {
             </form>
         </div>
         <div className="navbar-nav ms-auto">
+            {/* LINKS TO REGISTER AND LOGIN */}
             <li className="nav-item">
                 <Link className="nav-link" to="/register">Register</Link>
             </li>
