@@ -14,18 +14,43 @@ const experienceSchema = new mongoose.Schema(
             maxlength: 50,
         },
 
-        location: {
-            required: true,
+        description: {
             type: String,
+            maxlength: 200,
             trim: true,
         },
 
-        images: {
+        location: {
+            name: {
+                type: String,
+                required: true,
+                trim: true,
+            },
 
+            coordinates: {
+                type: [Number],
+                required: true,
+                validate: {
+                    validator: function (arr) {
+                        return Array.isArray(arr) && arr.length === 2;
+                    },
+                    message: "Coordinates must be [latitude, longitude]",
+                },
+            },
+        },
+
+        images: {
+            type: [String],
+            default: [],
+        },
+
+        date_traveled: {
+            type: Date,
         },
 
         keywords: {
-            type: String,
+            type: [String],
+            default: [],
             index: true,
         },
 
@@ -38,7 +63,7 @@ const experienceSchema = new mongoose.Schema(
         }
     },
     {
-        collecttion: "Experiences",
+        collection: "Experiences",
         timestamps: {
             createdAt: "created_at",
             updatedAt: "updated_at"
