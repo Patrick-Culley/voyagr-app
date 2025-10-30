@@ -19,3 +19,6 @@ app.listen(port, () => {
 });
 
 //app.use(cors({ origin: "http://localhost:3000" }));
+
+// Export app for testing
+module.exports = app;

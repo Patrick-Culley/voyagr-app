@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx mocha \"../tests/sanity.tests.js\" \"../tests/routes.tests.js\" --timeout 5000",
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
@@ -20,7 +20,11 @@
     "mongoose": "^8.19.2"
   },
   "devDependencies": {
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.38.0",
+    "mocha": "^11.7.4",
     "nodemon": "^3.1.10"
   }
 }

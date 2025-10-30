@@ -1,0 +1,43 @@
+# GITHUB ACTIONS  
+# This automatically builds and tests
+# whenever someone pushes to main  
+# or opens a pull request. This makes certain 
+# Voyagr is correctly built, all routes work, 
+# and that nothing breaks 
+
+name: Run Node Build and Tests 
+
+# Tells you what triggers the workflow 
+on:
+  push:
+    branches: [ main, dev, feature/** ]
+  pull_request:
+
+# Each job is its own VM 
+jobs:
+  test:
+    # GitHub uses a Linux runner:
+    # https://docs.github.com/en/actions/concepts/runners/github-hosted-runners
+    runs-on: ubuntu-latest   
+    
+    # This tells you the actions performed within each job 
+    steps:
+      # Checks out code from repo 
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Sets up correct Node version 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Run automated tests
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          npx mocha tests/**/*.js --timeout 10000
