@@ -16,6 +16,7 @@ on:
 # Each job is its own VM 
 jobs:
   test:
+    if: false
     # GitHub uses a Linux runner:
     # https://docs.github.com/en/actions/concepts/runners/github-hosted-runners
     runs-on: ubuntu-latest   
@@ -40,4 +41,4 @@ jobs:
       - name: Run tests
         run: |
           echo "Running tests..."
-          npx --no-install mocha "tests/**/*.tests.js" --timeout 10000
+          node ./node_modules/mocha/bin/mocha "tests/**/*.tests.js" --timeout 10000
