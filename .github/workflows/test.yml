@@ -40,4 +40,4 @@ jobs:
       - name: Run tests
         run: |
           echo "Running tests..."
-          npx mocha tests/**/*.js --timeout 10000
+          npx mocha tests/**/*tests.js --timeout 10000
