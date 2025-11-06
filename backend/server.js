@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cors({ origin: "http://localhost:3000" }));
 
 // Routes:
-app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/users", require("./routes/authRoutes"));
 app.use("/api/experiences", require("./routes/experienceRoutes"));
 app.use("/api/trips", require("./routes/tripRoutes"));
 app.use(errorHandler);
