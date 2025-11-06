@@ -11,7 +11,7 @@ const registerUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("All fields are mandatory!");
     }
-    
+
     // Check if the user with the same email is already registered
     const userAvailale = await User.findOne( { email });
     if (userAvailale) {
@@ -19,25 +19,25 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("The user is already registered");
     };
 
-    /* 
+    /*
     function to hash password
     LATER to implement
     And save hashedPassword for new user
     */
 
-    const newUser = await User.create({ 
-        username, 
-        email, 
+    const newUser = await User.create({
+        username,
+        email,
         password,
         last_login: new Date()
      });
 
     console.log(`User created: ${newUser}`);
     if (newUser) {
-        res.status(201).json({ 
-            message: "The user is sucessfully registered", 
+        res.status(201).json({
+            message: "The user is sucessfully registered",
             _id: newUser._id,
-            username: newUser.username, 
+            username: newUser.username,
             email: newUser.email
          });
     } else {
@@ -48,12 +48,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
 // Login user
 // @route POST api/users/login
-// public access 
+// public access
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        res.status(400);
-        throw new Error("All fields are mandatory.");
+        // res.status(400);
+        // throw new Error("All fields are mandatory.");
+        res.status(400).json({message: "All fields are mandatory."})
     };
 
     const user = await User.findOne({ email });
@@ -61,13 +62,13 @@ const loginUser = asyncHandler(async (req, res) => {
     /* compare hashedPassword with stored in db
     Add function to generate access token
     */
-    
+
     if (user && user.password === password) {
-        console.log("Login is succesfull");
+        console.log("Login is succesful");
         // update last login
         user.last_login = new Date();
         await user.save();
-        res.status(200).json({ 
+        res.status(200).json({
             message: "Login is succesfull",
             user: {
                 id: user._id,
@@ -76,8 +77,9 @@ const loginUser = asyncHandler(async (req, res) => {
                 },
             });
     } else {
-        res.status(401);
-        throw new Error("Email or password is not correct.");
+        // res.status(401);
+        // throw new Error("Email or password is not correct.");
+        res.status(401).json({message: "Email or password is incorrect. Please try again."})
     };
 });
 
