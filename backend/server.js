@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors({ origin: "*" }));
 
 // Routes:
-app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/users", require("./routes/authRoutes"));
 app.use("/api/experiences", require("./routes/experienceRoutes"));
 
 app.listen(port, () => {
