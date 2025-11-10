@@ -7,8 +7,6 @@ const Experience = require("../models/Experience");
 // @route POST api/ratings/:experienceId
 // private access
 const addRating = asyncHandler (async (req, res) => {
-    console.log("experience:", req.params);
-    console.log("score, review", req.body);
     const { experienceId } = req.params;
     const { score, review } = req.body;
     if (!score) {
