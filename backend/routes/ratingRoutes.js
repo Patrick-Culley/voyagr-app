@@ -3,6 +3,6 @@ const { addRating } = require("../controllers/ratingController");
 const router = express.Router();
 
 // Routes
-router.route("/").post(addRating);
+router.route("/:experienceId").post(addRating);
 
 module.exports = router;

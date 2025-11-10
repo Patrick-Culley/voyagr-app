@@ -15,7 +15,6 @@ const getExperiences = asyncHandler(async (req, res) => {
 // route POST api/experiences
 // access private
 const createExperience = asyncHandler (async (req, res) => {
-    console.log("The requested body is: ", req.body);
     const {title, date_traveled, description, location, images, keywords, visibility} = req.body;
     if (!title || !date_traveled || !location || !visibility) {
         res.status(400);
@@ -23,7 +22,7 @@ const createExperience = asyncHandler (async (req, res) => {
     };
     
     const newExperience = await Experience.create({
-        user_id: req.user.id,
+        user_id: "69120ab03cd24d3d39f9b154",
         title, 
         date_traveled, 
         description, 
@@ -32,8 +31,8 @@ const createExperience = asyncHandler (async (req, res) => {
         keywords,
         visibility
     })
-
-    res.status(201).json(newExperience);
+    console.log("The Experience was created!");
+    res.status(201).json({ message:"Experience was created", newExperience });
 });
 
 // Find experiences by search
@@ -80,6 +79,7 @@ const getExperience = asyncHandler (async (req, res) => {
     }
     res.status(200).json(experience);
 });
+
 
 module.exports = {
     getExperiences,

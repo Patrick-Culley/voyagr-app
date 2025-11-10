@@ -4,16 +4,19 @@ const Rating = require("../models/Rating");
 const Experience = require("../models/Experience");
 
 // Add Rating
-// @route POST api/ratings
+// @route POST api/ratings/:experienceId
 // private access
 const addRating = asyncHandler (async (req, res) => {
-    const { experience_id, user_id, score, review } = req.body;
+    console.log("experience:", req.params);
+    console.log("score, review", req.body);
+    const { experienceId } = req.params;
+    const { score, review } = req.body;
     if (!score) {
         return res.status(400).json({message: "Please add a score"});
     };
 
     const newRating = new Rating({
-        experience_id,
+        experience_id: experienceId,
         user_id : "69120ab03cd24d3d39f9b154", // hardcoded for now
         score,
         review
@@ -24,7 +27,7 @@ const addRating = asyncHandler (async (req, res) => {
     // Do the average Rating calculations
     const totalAvg = await Rating.aggregate([
         {$match: {
-            experience_id: new mongoose.Types.ObjectId(experience_id)
+            experience_id: new mongoose.Types.ObjectId(experienceId)
         }},
         { $group: {
             _id: "$experience_id", averageRating: {$avg: "$score" }
@@ -35,7 +38,7 @@ const addRating = asyncHandler (async (req, res) => {
     const average = totalAvg.length > 0 ? totalAvg[0].averageRating : 0;
 
     // Update average score for that experience
-    await Experience.findByIdAndUpdate(experience_id, {averageRating: average});
+    await Experience.findByIdAndUpdate(experienceId, {averageRating: average});
     res.status(201).json({ message: "Rating is added", rating: newRating, averageRating: average});
 });
 
