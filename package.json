@@ -5,6 +5,10 @@
     "mocha": "^11.7.4"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "mongoose": "^8.19.2"
+  },
+  "scripts": {
+    "test": "mocha tests/**/*.test.js --timeout 10000"
   }
 }

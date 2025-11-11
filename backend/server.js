@@ -18,6 +18,7 @@ app.use(cors({ origin: "http://localhost:3000" }));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/experiences", require("./routes/experienceRoutes"));
 app.use("/api/trips", require("./routes/tripRoutes"));
+app.use("/api/upload", require("./routes/uploadRoutes")); 
 app.use(errorHandler);
 
 app.listen(port, () => {

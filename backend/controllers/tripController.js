@@ -12,7 +12,7 @@ const createTrip = asyncHandler (async (req, res) => {
     }
 
     const newTrip = await Trip.create({
-        user_id,
+        user_id,     
         trip_name,
         trip_summary
     });
