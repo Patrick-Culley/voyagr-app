@@ -12,7 +12,11 @@ const createTrip = asyncHandler (async (req, res) => {
     }
 
     const newTrip = await Trip.create({
-        user_id: "69120ab03cd24d3d39f9b154",
+ feature/gcp-image-config
+        user_id,     
+=======
+        
+ main
         trip_name,
         trip_summary
     });

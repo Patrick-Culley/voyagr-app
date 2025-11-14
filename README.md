@@ -36,6 +36,9 @@ PORT=5555
 #### 3. Start the Backend Server 
 - Run the backend locally: `node server.js`
 
-
-
+## Image Upload Workflow 
+1. User uploads image via frontend form 
+2. Backend uses Google Cloud Storage to store image.
+3. Public URL is saved in MongoDB under `images` field of Experience object 
+4. Frontend retrieves/displays via <img src={url}>.
 
