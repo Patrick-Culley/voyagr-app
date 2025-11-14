@@ -21,6 +21,10 @@ function UserLogin() {
             if (response.ok) {
                 alert("You have successfully logged in!");
                 console.log("Success:", data);
+
+                localStorage.setItem("user", JSON.stringify(data.user));
+                window.location.href = "/";
+
                 enterEmail("");
                 enterPassword("");
                 navigate("/");

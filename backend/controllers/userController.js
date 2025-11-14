@@ -71,7 +71,7 @@ const loginUser = asyncHandler(async (req, res) => {
         res.status(200).json({
             message: "Login is succesfull",
             user: {
-                id: user._id,
+                _id: user._id,
                 email: user.email,
                 username: user.username,
                 },

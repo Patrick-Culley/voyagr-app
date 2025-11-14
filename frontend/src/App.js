@@ -4,6 +4,7 @@ import UserRegistration from "./components/userRegistration";
 import NavigationBar from "./components/navigationBar";
 import Trips from "./pages/myTrips"
 import UserLogin from "./pages/userLogin";
+import TripDetails from "./pages/tripDetails";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         {/* <Route path="/" element={<Home/>} /> */}
         <Route path="/register" element={<UserRegistration/>} />
         <Route path="/trips" element={<Trips/>} />
+        <Route path="/trips/:tripId" element={<TripDetails/>} />
         <Route path="/login" element={<UserLogin/>} />
       </Routes>
     </Router>
