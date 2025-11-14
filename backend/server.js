@@ -18,7 +18,11 @@ app.use(cors({ origin: "http://localhost:3000" }));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/experiences", require("./routes/experienceRoutes"));
 app.use("/api/trips", require("./routes/tripRoutes"));
+ feature/gcp-image-config
 app.use("/api/upload", require("./routes/uploadRoutes")); 
+=======
+app.use("/api/ratings", require("./routes/ratingRoutes"));
+ main
 app.use(errorHandler);
 
 app.listen(port, () => {

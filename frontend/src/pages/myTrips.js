@@ -1,33 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Trips() {
 
     const navigate = useNavigate();
+    const [trips, setTrips] = useState([]);
+    const [showTripForm, setTripForm] = useState(false);            // Track pop-up is visible
+    const [addTripName, setAddTripName] = useState("");             // Store and update trip name in input field
+    const [addTripSummary, setAddTripSummary] = useState("");       // Store and update trip summary in input field
 
-    // Mock data until schema gets merged into main repository
-    const [trips, setTrips] = useState([
-        { user_id: 1, trip_name: "Bali, Indonesia", trip_summary: "Tropical paradise!"},
-        { user_id: 2, trip_name: "Big Sur, California", trip_summary: "Mountainous adventure!"},
-        { user_id: 3, trip_name: "Melbourne, Australia", trip_summary: "City life in the Gold Coast."}
-        ]);
+    {/* LOAD TRIP DATA FROM BACKEND */}
+    useEffect(() => {
+        const fetchTrips = async() => {
+            try {
+                const response = await fetch("http://localhost:5555/api/trips");
+                const data = await response.json();
+                setTrips(data);
+            } catch (error) {
+                console.error("Error fetching trips:", error);
+            }
+        };
+        fetchTrips();
+    }, []);
 
-        const [showTripForm, setTripForm] = useState(false);            // Track pop-up is visible
-        const [addTripName, setAddTripName] = useState("");             // Store and update trip name in input field
-        const [addTripSummary, setAddTripSummary] = useState("");       // Store and update trip summary in input field
+    {/* HANDLES FORM SUBMISSION FOR ADDING TRIPS. POST REQUEST SENT TO BACKEND. */}
+    const handleAddTrip = async (event) => {
+        event.preventDefault();
 
-        const handleAddTrip = (event) => {
-            event.preventDefault();
-            const newTrip = {
-                user_id: trips.length + 1,
-                trip_name: addTripName,
-                trip_summary: addTripSummary
-            };
-            setTrips([...trips, newTrip]);
-            setTripForm(false);
-            setAddTripName("");
-            setAddTripSummary("");
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) {
+            alert("You must be logged in to add a trip.");
+            return;
         }
+
+        const newTrip = {
+            user_id: user._id,
+            trip_name: addTripName,
+            trip_summary: addTripSummary,
+        };
+
+        try {
+            const response = await fetch("http://localhost:5555/api/trips", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newTrip),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setTrips([...trips, data]);
+                setTripForm(false);
+                setAddTripName("");
+                setAddTripSummary("");
+            } else {
+                alert(data.message || "Error creating trip.");
+            }
+        } catch (error) {
+            console.error("Error adding trip", error);
+        }
+    };
+
 
     return (
         <div className="container mt-4">
@@ -37,7 +70,7 @@ function Trips() {
                     <div className="col-md-4 mb-4" key={trip.user_id}>
                         <div className="card h-100 shadow-sm"
                             style={{ cursor: "pointer" }}
-                            onClick={() => navigate(`/trips/${trip.user_id}`)}>
+                            onClick={() => navigate(`/trips/${trip._id}`, {state: {trip}})}>
                             <div className="card-body">
                                 <h5 className="card-title" class="text-center">{trip.trip_name}</h5>
                             </div>
@@ -82,7 +115,7 @@ function Trips() {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={() => setTripForm(false)}>Close</button>
-                                <button type="button" className="btn btn-primary">Save changes</button>
+                                <button type="submit" className="btn btn-primary">Save changes</button>
                             </div>
                         </form>
                     </div>

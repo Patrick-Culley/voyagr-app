@@ -45,6 +45,11 @@ const experienceSchema = new mongoose.Schema(
             default: [],
         },
 
+        averageRating: {
+            type: Number,
+            default: 0
+        },
+
         date_traveled: {
             type: Date,
         },

@@ -12,11 +12,15 @@ const createTrip = asyncHandler (async (req, res) => {
     }
 
     const newTrip = await Trip.create({
+ feature/gcp-image-config
         user_id,     
+=======
+        
+ main
         trip_name,
         trip_summary
     });
-    console.log("Trip is created: ", newTrip);
+    console.log("Trip is successfully created: ", newTrip);
     res.status(201).json(newTrip);
 });
 
@@ -33,7 +37,12 @@ const getTrips = asyncHandler(async (req, res) => {
 // private access
 const getTrip = asyncHandler (async (req, res) => {
     const { id } = req.params;
-    const trip = await Trip.findById(id);
+
+    const trip = await Trip.findById(id).populate({
+        path: "experiences",
+        select: "title description location images averageRating keywords"
+    });
+
     if(!trip) {
         res.status(404);
         throw new Error("Trip not found");
@@ -87,10 +96,37 @@ const deleteTrip = asyncHandler (async (req, res) => {
     console.log("The trip was deleted");
 });
 
+// add experience to a trip
+// @route api/trips/:tripId/addExperience
+// private access
+const addExperienceToTrip = asyncHandler (async (req, res) => {
+    const { tripId } = req.params;
+    const { experience_id } = req.body;
+    if (!experience_id) {
+        return res.status(400).json({ message: "Experience ID is required!"});
+    };
+
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+        return res.status(404).json({ message: "Trip not found"});
+    };
+
+    // Check if the experience was already added
+    if (!trip.experiences.includes(result => result.toString() === experience_id)) {
+        trip.experiences.push(experience_id);
+        await trip.save();
+    }
+    console.log("Experience was added to trip.");
+    const updatedTrip = await Trip.findById(tripId).populate("experiences");
+
+    res.status(200).json({ message: "Experience added to the Trip.", trip: updatedTrip });
+});
+
 module.exports = {
     createTrip,
     getTrips,
     getTrip,
     updateTrip,
-    deleteTrip
+    deleteTrip,
+    addExperienceToTrip
 };
