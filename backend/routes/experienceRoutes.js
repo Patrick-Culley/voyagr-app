@@ -3,7 +3,7 @@ const {
     getExperiences, 
     createExperience, 
     searchExperiences,
-    getExperience
+    getExperience,
 } = require("../controllers/experienceController");
 
 const router = express.Router();
