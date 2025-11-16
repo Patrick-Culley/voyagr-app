@@ -21,7 +21,7 @@ const addRating = asyncHandler (async (req, res) => {
     };
 
     /* check if the user already did the rating for experiece
-    If the user already added the rating, it will update existing Rate,
+    If the user already added the rating, it will update existing Rating,
     otherwise, it will create new Rating from the user to that experience
     */
     const findRating = await Rating.findOne({ 
