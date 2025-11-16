@@ -9,20 +9,45 @@ const Experience = require("../models/Experience");
 const addRating = asyncHandler (async (req, res) => {
     const { experienceId } = req.params;
     const { score, review } = req.body;
+    
+    // Validate experienceId
+    const validExperience = await Experience.findById(experienceId);
+    if (!validExperience){
+        return res.status(400).json({ message: "Invalid Experience ID"});
+    }
+
     if (!score) {
         return res.status(400).json({message: "Please add a score"});
     };
 
-    const newRating = new Rating({
+    /* check if the user already did the rating for experiece
+    If the user already added the rating, it will update existing Rate,
+    otherwise, it will create new Rating from the user to that experience
+    */
+    const findRating = await Rating.findOne({ 
+        user_id: "69120ab03cd24d3d39f9b154",
+        experience_id: experienceId
+    });
+
+    let newRating;
+    if (!findRating){
+        newRating = await Rating.create({
         experience_id: experienceId,
         user_id : "69120ab03cd24d3d39f9b154", // hardcoded for now
         score,
         review
     });
+    } else {
+        newRating = await Rating.findByIdAndUpdate(
+            findRating._id,
+            { score, review },
+            { new: true }
+        );
+    };
 
-    await newRating.save();
+    // await newRating.save();
 
-    // Do the average Rating calculations
+    // Do the average Rating calculations using aggregate 
     const totalAvg = await Rating.aggregate([
         {$match: {
             experience_id: new mongoose.Types.ObjectId(experienceId)
@@ -37,7 +62,15 @@ const addRating = asyncHandler (async (req, res) => {
 
     // Update average score for that experience
     await Experience.findByIdAndUpdate(experienceId, {averageRating: average});
-    res.status(201).json({ message: "Rating is added", rating: newRating, averageRating: average});
+
+    console.log(`New Rating was added.\nFor ${validExperience.title} average rating is updated.`);
+    res.status(201).json({ 
+        message: "Rating is added", 
+        experience: validExperience.title, 
+        experienceId: validExperience.id,
+        user_id: newRating.user_id, 
+        rating: newRating.score, 
+        averageRating: average});
 });
 
 module.exports = { addRating };
