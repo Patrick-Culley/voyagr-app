@@ -23,7 +23,7 @@ const createExperience = asyncHandler (async (req, res) => {
     };
 
     const newExperience = await Experience.create({
-        user_id: req.body.user_id,
+        user_id: req.user.id,
         trip_id,
         title,
         date_traveled,
