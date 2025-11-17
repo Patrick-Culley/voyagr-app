@@ -1,7 +1,8 @@
 const express = require("express");
-const { 
-    getExperiences, 
-    createExperience, 
+const {
+    getExperiences,
+    getExperiencesByTrip,
+    createExperience,
     searchExperiences,
     getExperience
 } = require("../controllers/experienceController");
@@ -13,6 +14,8 @@ router.route("/")
     .post(createExperience);
 
 router.route("/search").get(searchExperiences);
+
+router.get("/trip/:tripId", getExperiencesByTrip);
 
 router.route("/:id").get(getExperience);
 

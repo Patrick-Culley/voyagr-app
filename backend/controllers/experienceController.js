@@ -16,21 +16,22 @@ const getExperiences = asyncHandler(async (req, res) => {
 // access private
 const createExperience = asyncHandler (async (req, res) => {
     console.log("The requested body is: ", req.body);
-    const {title, date_traveled, description, location, images, keywords, visibility} = req.body;
+    const {trip_id, title, date_traveled, description, location, images, keywords, visibility} = req.body;
     if (!title || !date_traveled || !location || !visibility) {
         res.status(400);
         throw new Error("Title, Date, location and visibility fields are mandatory");
     };
-    
+
     const newExperience = await Experience.create({
-        user_id: req.user.id,
-        title, 
-        date_traveled, 
-        description, 
-        location, 
-        images,  
+        user_id: req.body.user_id,
+        trip_id,
+        title,
+        date_traveled,
+        description,
+        location,
+        images,
         keywords,
-        visibility
+        visibility,
     })
 
     res.status(201).json(newExperience);
@@ -50,7 +51,7 @@ const searchExperiences = asyncHandler (async (req, res) => {
         { title: { $regex: keyword, $options: "i" } },
         ];
     };;
-    
+
     // search by location nearby
     if (lat && long) {
         searchQuery.location = {
@@ -60,7 +61,7 @@ const searchExperiences = asyncHandler (async (req, res) => {
             }
         };
     };
-    
+
     const filteredExperiences = await Experience.find(searchQuery);
 
     if (!filteredExperiences.length) {
@@ -81,8 +82,21 @@ const getExperience = asyncHandler (async (req, res) => {
     res.status(200).json(experience);
 });
 
+const getExperiencesByTrip = async (req, res) => {
+    try {
+        const tripId = req.params.tripId;
+        const experience = await Experience.find({
+            trip_id: tripId
+        });
+        res.status(200).json(experience);
+    } catch (error) {
+        res.status(500).json({message: "Error fetching experiences for this trip." });
+    }
+}
+
 module.exports = {
     getExperiences,
+    getExperiencesByTrip,
     createExperience,
     searchExperiences,
     getExperience

@@ -5,6 +5,7 @@ import NavigationBar from "./components/navigationBar";
 import Trips from "./pages/myTrips"
 import UserLogin from "./pages/userLogin";
 import TripDetails from "./pages/tripDetails";
+import AddExperience from "./components/addExperience";
 
 function App() {
   return (
@@ -16,9 +17,10 @@ function App() {
       <Routes>
         {/* <Route path="/" element={<Home/>} /> */}
         <Route path="/register" element={<UserRegistration/>} />
+        <Route path="/login" element={<UserLogin/>} />
         <Route path="/trips" element={<Trips/>} />
         <Route path="/trips/:tripId" element={<TripDetails/>} />
-        <Route path="/login" element={<UserLogin/>} />
+        <Route path="/trips/:tripId/add-experience" element={<AddExperience/>} />
       </Routes>
     </Router>
   );

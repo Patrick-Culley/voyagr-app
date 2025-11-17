@@ -6,8 +6,8 @@ function Trips() {
     const navigate = useNavigate();
     const [trips, setTrips] = useState([]);
     const [showTripForm, setTripForm] = useState(false);            // Track pop-up is visible
-    const [addTripName, setAddTripName] = useState("");             // Store and update trip name in input field
-    const [addTripSummary, setAddTripSummary] = useState("");       // Store and update trip summary in input field
+    const [name, setName] = useState("");             // Store and update trip name in input field
+    const [summary, setSummary] = useState("");       // Store and update trip summary in input field
 
     {/* LOAD TRIP DATA FROM BACKEND */}
     useEffect(() => {
@@ -35,8 +35,8 @@ function Trips() {
 
         const newTrip = {
             user_id: user._id,
-            trip_name: addTripName,
-            trip_summary: addTripSummary,
+            trip_name: name,
+            trip_summary: summary,
         };
 
         try {
@@ -51,8 +51,8 @@ function Trips() {
             if (response.ok) {
                 setTrips([...trips, data]);
                 setTripForm(false);
-                setAddTripName("");
-                setAddTripSummary("");
+                setName("");
+                setSummary("");
             } else {
                 alert(data.message || "Error creating trip.");
             }
@@ -72,7 +72,7 @@ function Trips() {
                             style={{ cursor: "pointer" }}
                             onClick={() => navigate(`/trips/${trip._id}`, {state: {trip}})}>
                             <div className="card-body">
-                                <h5 className="card-title" class="text-center">{trip.trip_name}</h5>
+                                <h5 className="card-title text-center">{trip.trip_name}</h5>
                             </div>
                         </div>
                     </div>
@@ -101,16 +101,16 @@ function Trips() {
                                     <input
                                     type="text"
                                     className="form-control"
-                                    value={addTripName}
-                                    onChange={(e) => setAddTripName(e.target.value)} required/>
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)} required/>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Tell us about it!</label>
                                     <textarea
                                     rows="5"
                                     className="form-control"
-                                    value={addTripSummary}
-                                    onChange={(e) => setAddTripSummary(e.target.value)} required/>
+                                    value={summary}
+                                    onChange={(e) => setSummary(e.target.value)} required/>
                                 </div>
                             </div>
                             <div className="modal-footer">
