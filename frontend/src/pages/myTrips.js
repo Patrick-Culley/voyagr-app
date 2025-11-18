@@ -12,8 +12,10 @@ function Trips() {
     {/* LOAD TRIP DATA FROM BACKEND */}
     useEffect(() => {
         const fetchTrips = async() => {
+            const user = JSON.parse(localStorage.getItem("user"));
+            if (!user || !user._id) return;
             try {
-                const response = await fetch("http://localhost:5555/api/trips");
+                const response = await fetch(`http://localhost:5555/api/trips?user_id=${user._id}`);
                 const data = await response.json();
                 setTrips(data);
             } catch (error) {
@@ -72,7 +74,7 @@ function Trips() {
                             style={{ cursor: "pointer" }}
                             onClick={() => navigate(`/trips/${trip._id}`, {state: {trip}})}>
                             <div className="card-body">
-                                <h5 className="card-title" class="text-center">{trip.trip_name}</h5>
+                                <h5 className="card-title text-center" class="text-center">{trip.trip_name}</h5>
                             </div>
                         </div>
                     </div>

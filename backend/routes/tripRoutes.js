@@ -6,8 +6,11 @@ const {
     getTrip, 
     updateTrip, 
     deleteTrip,
-    addExperienceToTrip
+    addExperienceToTrip, 
+    searchTrips
  } = require("../controllers/tripController");
+
+router.get("/search", searchTrips);
 
 // Routes for CRUD functionality for Trips
 router.route("/")
