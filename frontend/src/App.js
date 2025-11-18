@@ -5,6 +5,9 @@ import NavigationBar from "./components/navigationBar";
 import Trips from "./pages/myTrips"
 import UserLogin from "./pages/userLogin";
 import TripDetails from "./pages/tripDetails";
+import SearchResults from "./pages/SearchResults";
+import AddExperience from "./pages/addExperience";
+import ExperiencesPage from "./pages/experiencePage";
 
 function App() {
   return (
@@ -16,9 +19,12 @@ function App() {
       <Routes>
         {/* <Route path="/" element={<Home/>} /> */}
         <Route path="/register" element={<UserRegistration/>} />
+        <Route path="/login" element={<UserLogin/>} />
         <Route path="/trips" element={<Trips/>} />
         <Route path="/trips/:tripId" element={<TripDetails/>} />
-        <Route path="/login" element={<UserLogin/>} />
+        <Route path="/experiences" element={<ExperiencesPage/>} />
+        <Route path="/add-experience" element={<AddExperience/>} />
+        <Route path="/search" element={<SearchResults />} />
       </Routes>
     </Router>
   );

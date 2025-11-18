@@ -12,11 +12,7 @@ const createTrip = asyncHandler (async (req, res) => {
     }
 
     const newTrip = await Trip.create({
- feature/gcp-image-config
         user_id,     
-=======
-        
- main
         trip_name,
         trip_summary
     });
@@ -28,7 +24,13 @@ const createTrip = asyncHandler (async (req, res) => {
 // @route GET api/trips
 // access private
 const getTrips = asyncHandler(async (req, res) => {
-    const trips = await Trip.find({});
+    const { user_id } = req.query;
+
+    if (!user_id) {
+        return res.status(400).json({ message: "user_id is required" });
+    }
+
+    const trips = await Trip.find({ user_id });
     res.status(200).json(trips);
 });
 
@@ -38,10 +40,7 @@ const getTrips = asyncHandler(async (req, res) => {
 const getTrip = asyncHandler (async (req, res) => {
     const { id } = req.params;
 
-    const trip = await Trip.findById(id).populate({
-        path: "experiences",
-        select: "title description location images averageRating keywords"
-    });
+    const trip = await Trip.findById(id);
 
     if(!trip) {
         res.status(404);
@@ -112,7 +111,7 @@ const addExperienceToTrip = asyncHandler (async (req, res) => {
     };
 
     // Check if the experience was already added
-    if (!trip.experiences.includes(result => result.toString() === experience_id)) {
+    if (!trip.experiences.some(result => result.toString() === experience_id)) {
         trip.experiences.push(experience_id);
         await trip.save();
     }
@@ -122,11 +121,35 @@ const addExperienceToTrip = asyncHandler (async (req, res) => {
     res.status(200).json({ message: "Experience added to the Trip.", trip: updatedTrip });
 });
 
+// Search trips by name or summary
+// @route GET api/trips/search?q=text
+// @access public (or private depending on your app)
+const searchTrips = asyncHandler(async (req, res) => {
+    const { q } = req.query;
+
+    if (!q || q.trim() === "") {
+        return res.status(400).json({ message: "Query is required" });
+    }
+
+    const regex = new RegExp(q, "i"); // case-insensitive match
+
+    const trips = await Trip.find({
+        $or: [
+            { trip_name: { $regex: regex } },
+            { trip_summary: { $regex: regex } }
+        ]
+    });
+
+    res.status(200).json(trips);
+});
+
+
 module.exports = {
     createTrip,
     getTrips,
     getTrip,
     updateTrip,
     deleteTrip,
-    addExperienceToTrip
+    addExperienceToTrip, 
+    searchTrips
 };

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 function NavigationBar() {
 
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+    const [query, setQuery] = useState("");
     const navigate = useNavigate();
 
     {/* ALLOWS APP TO REACT TO CHANGES IN localStorage WHEN "user" ITEM IS ADDED/REMOVED */}
@@ -24,6 +25,18 @@ function NavigationBar() {
         navigate("/");
     }
 
+    // SEARCH SUBMIT HANDLER
+    const handleSearch = (e) => {
+        e.preventDefault();
+
+        // navigate to search results page
+        if (query.trim() !== "") {
+            navigate(`/search?q=${query}`);
+        }
+
+        setQuery(""); // clear search bar after submitting
+    };
+
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light px-3 position-relative">
         <div className="container">
@@ -39,15 +52,21 @@ function NavigationBar() {
                         <Link className="nav-link" to="/trips">My Trips</Link>
                     </li>
                 )}
+                <li className="nav-item">
+                    <Link className="nav-link" to="/experiences">Experiences</Link>
+                </li>
             </div>
             {/* SEARCH BAR */}
-            <form className="d-flex position-absolute top-30 start-50 translate-middle-x" role="search">
-                <input class="form-control me-2"
-                type="search"
-                placeholder="Bon Voyage!"
-                aria-label="Search"
-                style={{ width: "400px "}}/>
-                <button class="btn btn-outline-success" type="submit">Search</button>
+            <form className="d-flex position-absolute top-30 start-50 translate-middle-x" role="search" onSubmit={handleSearch}>
+                <input className="form-control me-2"
+                    type="search"
+                    placeholder="Bon Voyage!"
+                    aria-label="Search"
+                    style={{ width: "400px "}}
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                />
+                <button className="btn btn-outline-success" type="submit">Search</button>
             </form>
         </div>
         {!user && (

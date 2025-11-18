@@ -1,7 +1,7 @@
 const express = require("express");
-const { 
-    getExperiences, 
-    createExperience, 
+const {
+    getExperiences,
+    createExperience,
     searchExperiences,
     getExperience,
 } = require("../controllers/experienceController");
