@@ -12,11 +12,7 @@ const createTrip = asyncHandler (async (req, res) => {
     }
 
     const newTrip = await Trip.create({
- feature/gcp-image-config
-        user_id,     
-=======
-        
- main
+        user_id: "69120ab03cd24d3d39f9b154",     
         trip_name,
         trip_summary
     });
@@ -112,7 +108,7 @@ const addExperienceToTrip = asyncHandler (async (req, res) => {
     };
 
     // Check if the experience was already added
-    if (!trip.experiences.includes(result => result.toString() === experience_id)) {
+    if (!trip.experiences.some(result => result.toString() === experience_id)) {
         trip.experiences.push(experience_id);
         await trip.save();
     }

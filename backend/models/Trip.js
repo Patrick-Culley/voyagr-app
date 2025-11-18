@@ -19,6 +19,10 @@ const tripSchema = new mongoose.Schema(
             type: String,
             maxlength: 300, 
             trim: true,  
+        },
+        experiences: {
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: "Experience"
         }
     },
     {
