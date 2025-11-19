@@ -38,25 +38,16 @@ const createExperience = asyncHandler (async (req, res) => {
 // route GET api/experiences/search
 // access public
 const searchExperiences = asyncHandler (async (req, res) => {
-    const { keyword, lat, long } = req.query;
+    const { search } = req.query;
     const searchQuery = {};
 
-    // search by keyword or by title
-    if (keyword) {
+    // search by keyword or by title or location name
+    if (search) {
         searchQuery.$or = [
-        { keywords: { $regex: keyword, $options: "i" } },
-        { title: { $regex: keyword, $options: "i" } },
+        { keywords: { $regex: search, $options: "i" } },
+        { title: { $regex: search, $options: "i" } },
+        { "location.name": { $regex: search, $options: "i"} }
         ];
-    };;
-
-    // search by location nearby
-    if (lat && long) {
-        searchQuery.location = {
-            $near: {
-            $geometry: { type: "Point", coordinates: [parseFloat(long), parseFloat(lat)] },
-            $maxDistance: 50000,
-            }
-        };
     };
 
     const filteredExperiences = await Experience.find(searchQuery);
