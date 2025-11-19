@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
+const argon2 = require("argon2");
+const jwt = require("jsonwebtoken");
 
 // Register a user
 // @route POST api/users/register
@@ -13,29 +15,25 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     // Check if the user with the same email is already registered
-    const userAvailale = await User.findOne( { email });
-    if (userAvailale) {
+    const userAvailable = await User.findOne( { email });
+    if (userAvailable) {
         res.status(400);
         throw new Error("The user is already registered");
     };
 
-    /*
-    function to hash password
-    LATER to implement
-    And save hashedPassword for new user
-    */
+    const passHash = await argon2.hash(password)
 
     const newUser = await User.create({
         username,
         email,
-        password,
+        password: passHash,
         last_login: new Date()
      });
 
     console.log(`User created: ${newUser}`);
     if (newUser) {
         res.status(201).json({
-            message: "The user is sucessfully registered",
+            message: "The user is successfully registered!",
             _id: newUser._id,
             username: newUser.username,
             email: newUser.email
@@ -52,24 +50,49 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        // res.status(400);
-        // throw new Error("All fields are mandatory.");
-        res.status(400).json({message: "All fields are mandatory."})
+        res.status(400);
+        throw new Error("All fields are mandatory.");
+        // res.status(400).json({message: "All fields are mandatory."})
     };
 
     const user = await User.findOne({ email });
 
-    /* compare hashedPassword with stored in db
-    Add function to generate access token
-    */
+     // invalid login info check
+    if (!user) {
+        res.status(401);
+        throw new Error("Invalid email/username or password.");
+    };
 
-    if (user && user.password === password) {
-        console.log("Login is succesful");
+    // verify password, retrieves hashed password
+    const validPass = await argon2.verify(user.password, password);
+
+    if (validPass) {
+        
+        // token creation for secure login
+        const token = jwt.sign({
+            userId: user._id},
+            process.env.JWT_SECRET,
+            {expiresIn: "15m"}
+        );
+        
+        // authentication token
+        // http only where JS cant access cookie
+        // secure only sends cookies over HTTPS in production
+        // samesite controls cross site requests
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+            maxAge: 15 * 60 * 1000,
+        });
+        console.log("Login is successful");
+
         // update last login
         user.last_login = new Date();
         await user.save();
+
         res.status(200).json({
-            message: "Login is succesfull",
+            message: "Login is successful",
             user: {
                 _id: user._id,
                 email: user.email,
@@ -77,10 +100,24 @@ const loginUser = asyncHandler(async (req, res) => {
                 },
             });
     } else {
-        // res.status(401);
-        // throw new Error("Email or password is not correct.");
-        res.status(401).json({message: "Email or password is incorrect. Please try again."})
-    };
+        res.status(401);
+        throw new Error("Email or password is not correct.");
+        // res.status(401).json({
+        //     message: "Email or password is incorrect. Please try again."
+        // });
+    }
 });
 
-module.exports = { registerUser, loginUser };
+// logs out user
+// POST api/users/logout
+const logoutUser = asyncHandler(async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+    });
+    res.json({message: "Successfully logged out user."});
+});
+
+
+module.exports = { registerUser, loginUser, logoutUser };
