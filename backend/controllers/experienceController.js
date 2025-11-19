@@ -20,16 +20,16 @@ const createExperience = asyncHandler (async (req, res) => {
         res.status(400);
         throw new Error("Title, Date, location and visibility fields are mandatory");
     };
-    
+
     const newExperience = await Experience.create({
-        user_id: "69120ab03cd24d3d39f9b154",
-        title, 
-        date_traveled, 
-        description, 
-        location, 
-        images,  
+        user_id: req.body.user_id,
+        title,
+        date_traveled,
+        description,
+        location,
+        images,
         keywords,
-        visibility
+        visibility,
     })
     console.log("The Experience was created!");
     res.status(201).json({ message:"Experience was created", newExperience });
@@ -49,7 +49,7 @@ const searchExperiences = asyncHandler (async (req, res) => {
         { title: { $regex: keyword, $options: "i" } },
         ];
     };;
-    
+
     // search by location nearby
     if (lat && long) {
         searchQuery.location = {
@@ -59,7 +59,7 @@ const searchExperiences = asyncHandler (async (req, res) => {
             }
         };
     };
-    
+
     const filteredExperiences = await Experience.find(searchQuery);
 
     if (!filteredExperiences.length) {

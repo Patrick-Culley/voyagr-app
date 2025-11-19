@@ -52,6 +52,9 @@ function NavigationBar() {
                         <Link className="nav-link" to="/trips">My Trips</Link>
                     </li>
                 )}
+                <li className="nav-item">
+                    <Link className="nav-link" to="/experiences">Experiences</Link>
+                </li>
             </div>
             {/* SEARCH BAR */}
             <form className="d-flex position-absolute top-30 start-50 translate-middle-x" role="search" onSubmit={handleSearch}>
