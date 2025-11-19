@@ -17,8 +17,7 @@ const getExperiences = asyncHandler(async (req, res) => {
 const createExperience = asyncHandler (async (req, res) => {
     const {title, date_traveled, description, location, images, keywords, visibility} = req.body;
     if (!title || !date_traveled || !location || !visibility) {
-        res.status(400);
-        throw new Error("Title, Date, location and visibility fields are mandatory");
+        res.status(400).json({message:"Title, Date, location and visibility fields are mandatory" });
     };
 
     const newExperience = await Experience.create({
@@ -74,8 +73,7 @@ const searchExperiences = asyncHandler (async (req, res) => {
 const getExperience = asyncHandler (async (req, res) => {
     const experience = await Experience.findById(req.params.id);
     if (!experience) {
-        res.status(404);
-        throw new Error("Experience not found");
+        res.status(404).json({message:"Experience not found"});
     }
     res.status(200).json(experience);
 });
