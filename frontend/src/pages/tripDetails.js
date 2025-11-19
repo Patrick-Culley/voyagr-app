@@ -27,19 +27,6 @@ function TripDetails() {
         fetchTrips();
     }, [tripId]);
 
-    useEffect(() => {
-        const fetchExperiences = async() => {
-            try {
-                const response = await fetch(`http://localhost:5555/api/experiences/trip/${tripId}`);
-                const data = await response.json();
-                setExperiences(data);
-            } catch (error) {
-                console.error("Error fetching experiences:", error);
-            }
-        };
-        fetchExperiences();
-    }, [tripId])
-
     {/* HANDLES SUBMITTING EDITS FOR A TRIP. PUT REQUEST SENT TO BACKEND. */}
     const handleUpdateTrip = async (e) => {
         e.preventDefault();
@@ -95,7 +82,7 @@ function TripDetails() {
                         <button className="btn btn-secondary me-2 align-self-start" onClick={() => navigate(-1)}>
                             <i className="bi bi-arrow-left"></i>
                         </button>
-                        <button className="btn btn-secondary me-2 align-self-start" onClick={() => navigate(`/add-experience`)}>Add an experience!</button>
+                        <button className="btn btn-secondary me-2 align-self-start" onClick={() => navigate(`/experiences`)}>Add an experience!</button>
                         <button className="btn btn-secondary me-2 align-self-start" onClick={() => setEditForm(true)}>
                             <i className="bi bi-pencil-square"></i>
                         </button>
@@ -108,12 +95,12 @@ function TripDetails() {
                 <p>Loading trip details...</p>
             )}
             {/* DISPLAY EXPERIENCES FROM TRIP */}
-            <div className="row">
-                {experiences.map((experience) => (
+            <div className="row mt-4">
+                {trip?.experiences?.map((experience) => (
                     <div className="col-md-4 mb-4 py-4" key={experience._id}>
                         <div className="card h-100 shadow-sm"
                             style={{ cursor: "pointer" }}
-                            onClick={() => navigate(`/experiences/${experience._id}`, {state: {experience : experience}})}>
+                            onClick={() => navigate(`/experiences/${experience._id}`)}>
                             <div className="card-body">
                                 <h5 className="card-title text-center">{experience.title}</h5>
                             </div>

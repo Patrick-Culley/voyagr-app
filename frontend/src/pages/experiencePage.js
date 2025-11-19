@@ -26,7 +26,10 @@ function ExperiencesPage() {
             )}
             <div className="row">
                 {experiences.map((experience) => (
-                    <div key={experience._id} className="col-md-4 mb-4">
+                    <div key={experience._id}
+                     className="col-md-4 mb-4"
+                     onClick={() => navigate(`/experiences/${experience._id}`)}
+                     style={{cursor: "pointer"}}>
                         <div className="card shadow-sm h-100">
                             {experience.images?.length > 0 && (
                                 <img
