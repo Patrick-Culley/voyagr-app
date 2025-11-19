@@ -9,6 +9,7 @@ import SearchResults from "./pages/SearchResults";
 import AddExperience from "./pages/addExperience";
 import ExperiencesPage from "./pages/experiencePage";
 
+
 function App() {
   return (
     <Router>
@@ -24,6 +25,7 @@ function App() {
         <Route path="/trips/:tripId" element={<TripDetails/>} />
         <Route path="/experiences" element={<ExperiencesPage/>} />
         <Route path="/add-experience" element={<AddExperience/>} />
+        <Route path="/login" element={<UserLogin/>} />
         <Route path="/search" element={<SearchResults />} />
       </Routes>
     </Router>

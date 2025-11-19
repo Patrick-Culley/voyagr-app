@@ -7,12 +7,14 @@ const errorHandler = require("./middleware/errorHandler");
 
 connectDb();
 const app = express();
-// This is for deployment
-const port = process.env.PORT
+// This is for deployment 
+const port = process.env.PORT 
+
 // Use for testing -> const port = process.env.PORT || 5555;
 app.use(express.json());
 
 // allow React frontend to access routes
+
 app.use(cors({ origin: "http://localhost:3000" }));
 
 // Routes:
