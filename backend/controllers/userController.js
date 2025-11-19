@@ -8,15 +8,19 @@ const registerUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
     // check for empty fields
     if (!username || !email || !password) {
-        res.status(400);
-        throw new Error("All fields are mandatory!");
+        return res.status(400).json({message: "All fields are mandatory."})
     }
 
     // Check if the user with the same email is already registered
     const userAvailale = await User.findOne( { email });
     if (userAvailale) {
-        res.status(400);
-        throw new Error("The user is already registered");
+        return res.status(400).json({message: "The user is already registered" });
+    };
+
+    // Validate password
+    const validPassword = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).+$/;
+    if (!validPassword.test(password)) {
+        return res.status(400).json({ message: "The password should have at least 8 characters, 1 number and 1 upper case letter"});
     };
 
     /*
@@ -52,8 +56,6 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        // res.status(400);
-        // throw new Error("All fields are mandatory.");
         res.status(400).json({message: "All fields are mandatory."})
     };
 
@@ -77,8 +79,6 @@ const loginUser = asyncHandler(async (req, res) => {
                 },
             });
     } else {
-        // res.status(401);
-        // throw new Error("Email or password is not correct.");
         res.status(401).json({message: "Email or password is incorrect. Please try again."})
     };
 });
