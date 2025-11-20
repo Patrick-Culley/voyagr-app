@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function UserRegistration() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -24,8 +26,10 @@ function UserRegistration() {
               setUsername("");
               setEmail("");
               setPassword("");
+
+              navigate("/");
             } else {
-              alert("Something went wrong");
+              alert(data.message || "Something went wrong");
               console.error("Error:", data);
             }
           } catch (error) {
