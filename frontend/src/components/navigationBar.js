@@ -31,7 +31,7 @@ function NavigationBar() {
 
         // navigate to search results page
         if (query.trim() !== "") {
-            navigate(`/search?q=${query}`);
+            navigate(`/search?search=${query}`);
         }
 
         setQuery(""); // clear search bar after submitting

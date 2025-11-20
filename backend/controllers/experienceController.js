@@ -41,6 +41,10 @@ const searchExperiences = asyncHandler (async (req, res) => {
     const { search } = req.query;
     const searchQuery = {};
 
+    if (!search) {
+        return res.status(400).json({ message: "Search query is required" });
+    }
+
     // search by keyword or by title or location name
     if (search) {
         searchQuery.$or = [
