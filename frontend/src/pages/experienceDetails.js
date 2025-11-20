@@ -1,0 +1,120 @@
+ import { useParams, useNavigate } from "react-router-dom";
+ import React, { useEffect, useState } from "react";
+
+ function ExperienceDetails() {
+    const { experienceId } = useParams();
+    const [experience, setExperience] = useState(null);
+    const [trips, setTrips] = useState([]);
+    const [selectedTrip, setSelectedTrip] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchExperiences = async() => {
+            try {
+                const response = await fetch(`http://localhost:5555/api/experiences/${experienceId}`);
+                const data = await response.json();
+                setExperience(data);
+            } catch(error) {
+                console.error("Error fetching experience details.", error);
+            }
+        };
+        fetchExperiences();
+    }, [experienceId]);
+
+    useEffect(() => {
+        const fetchTrips = async () => {
+            try {
+                const user = JSON.parse(localStorage.getItem("user"));
+                const userId = user._id;
+                const response = await fetch(`http://localhost:5555/api/trips?user_id=${userId}`);
+                const data = await response.json();
+                setTrips(data);
+            } catch (error) {
+                console.error("Error fetching trips.", error);
+            }
+        };
+        fetchTrips();
+    }, []);
+
+    if (!experience) {
+        return <p className="container mt-4">Loading...</p>
+    }
+
+    const handleSaveToTrip = async() => {
+        if (!selectedTrip) return alert("Please select a trip.");
+
+        try {
+            const response = await fetch(`http://localhost:5555/api/trips/${selectedTrip}/addExperience`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ experience_id: experience._id }),
+            });
+            if (!response.ok) throw new Error("Failed to save experience.");
+            alert("Experience saved!");
+            setShowModal(false);
+            navigate(`/trips/${selectedTrip}`)
+        } catch (error) {
+            console.error("Error saving experience", error);
+        }
+    }
+
+    return (
+        <div className="container mt-4">
+            <div className="card p-4 shadow d-flex flex-column" style={{minHeight: "900px"}}>
+                <div style={{flexGrow: 1}}>
+                    <h2>{experience.title}</h2>
+                    <p className="text-muted">{experience.location?.name}</p>
+                    {experience.images?.length > 0 && (
+                        <img
+                            src={experience.images[0]}
+                            alt=""
+                            style={{width: "100%", height: "450px", objectFit: "cover"}}
+                            className="rounded mb-3"
+                        />
+                    )}
+                    <h6>Date: {new Date(experience.date_traveled).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    })}</h6>
+                    <p>{experience.description}</p>
+                </div>
+                <div className="d-flex justify-content-between align-items-center mt-3">
+                    <p className="mb-0 text-wrap">Keywords: {experience.keywords?.join(", ")}</p>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => setShowModal(true)}
+                    >
+                        <i className="bi bi-bookmark-plus-fill"></i>
+                    </button>
+                </div>
+            </div>
+            {showModal&& (
+                <div className="modal-content p-4 shadow bg-white rounded" style={{maxWidth: "400px", margin: "100px auto"}}>
+                    <h5>Save to My Trip</h5>
+                    <select
+                        className="form-select my-3"
+                        value={selectedTrip}
+                        onChange={(e) => setSelectedTrip(e.target.value)}
+                    >
+                        <option value="">Select a trip</option>
+                        {trips.map((trip) => (
+                            <option key={trip._id} value={trip._id}>{trip.trip_name}</option>
+                        ))}
+                        </select>
+                        <div className="d-flex justify-content-end">
+                            <button className="btn btn-secondary me-2" onClick={() => setShowModal(false)}>
+                                Cancel
+                            </button>
+                            <button className="btn btn-primary" onClick={handleSaveToTrip}>
+                                Save
+                            </button>
+                        </div>
+                </div>
+            )}
+        </div>
+    )
+ }
+
+ export default ExperienceDetails;

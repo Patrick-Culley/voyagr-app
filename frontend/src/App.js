@@ -8,6 +8,7 @@ import TripDetails from "./pages/tripDetails";
 import SearchResults from "./pages/SearchResults";
 import AddExperience from "./pages/addExperience";
 import ExperiencesPage from "./pages/experiencePage";
+import ExperienceDetails from "./pages/experienceDetails";
 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/trips/:tripId" element={<TripDetails/>} />
         <Route path="/experiences" element={<ExperiencesPage/>} />
         <Route path="/add-experience" element={<AddExperience/>} />
+        <Route path="/experiences/:experienceId" element={<ExperienceDetails/>} />
         <Route path="/login" element={<UserLogin/>} />
         <Route path="/search" element={<SearchResults />} />
       </Routes>

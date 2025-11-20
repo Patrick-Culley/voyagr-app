@@ -3,7 +3,7 @@ const Trip = require("../models/Trip");
 
 // Create a trip
 // @route POST api/trips
-// @access private 
+// @access private
 const createTrip = asyncHandler (async (req, res) => {
     const { user_id, trip_name, trip_summary } = req.body;
     if (!trip_name) {
@@ -12,7 +12,7 @@ const createTrip = asyncHandler (async (req, res) => {
     }
 
     const newTrip = await Trip.create({
-        user_id,     
+        user_id,
         trip_name,
         trip_summary
     });
@@ -40,7 +40,7 @@ const getTrips = asyncHandler(async (req, res) => {
 const getTrip = asyncHandler (async (req, res) => {
     const { id } = req.params;
 
-    const trip = await Trip.findById(id);
+    const trip = await Trip.findById(id).populate("experiences");
 
     if(!trip) {
         res.status(404);
@@ -150,6 +150,6 @@ module.exports = {
     getTrip,
     updateTrip,
     deleteTrip,
-    addExperienceToTrip, 
+    addExperienceToTrip,
     searchTrips
 };
