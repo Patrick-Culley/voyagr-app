@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useState } from "react";
+import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
 
 function AddExperience() {
     const {tripId} = useParams();
@@ -12,6 +13,30 @@ function AddExperience() {
     const [dateTraveled, setDateTraveled] = useState("");
     const [keywords, setKeywords] = useState("");
     const [visibility, setVisibility] = useState("public");
+    const {
+        ready,
+        value: locationInput,
+        suggestions: { status, data },
+        setValue: setLocationValue,
+        clearSuggestions
+    } = usePlacesAutocomplete();
+
+    const [coords, setCoords] = useState({ lat: null, lng: null });
+
+    const handleSelectLocation = async (address) => {
+        setLocationValue(address, false);
+        clearSuggestions();
+        setLocation(address);  // set your existing location state
+
+        const results = await getGeocode({ address });
+        const { lat, lng } = await getLatLng(results[0]);
+
+        console.log("Selected location:", address);
+        console.log("Latitude:", lat);
+        console.log("Longitude:", lng);
+        
+        setCoords({ lat, lng });
+    };
 
     {/* HANDLE FORM SUBMISSION FOR ADDING AN EXPERIENCE */}
     const handleAddExperience = async (event) => {
@@ -28,7 +53,10 @@ function AddExperience() {
             user_id: user._id,
             title: title,
             description: description,
-            location: {name: location, coordinates: [0, 0]},    // placeholder coordinates
+            location: {
+                name: location,
+                coordinates: [coords.lng, coords.lat]   // Mongo GeoJSON expects [lng, lat]
+            },
             date_traveled: dateTraveled,
             keywords: keywords ? keywords.split(",").map(k => k.trim()) : [],
             visibility: visibility,
@@ -112,15 +140,31 @@ function AddExperience() {
                         onChange={(e) => setDescription(e.target.value)}
                     />
                 </div>
-                <div className="mb-3">
+                <div className="mb-3 position-relative">
                     <label className="form-label">Location</label>
                     <input
                         type="text"
                         className="form-control"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
+                        value={locationInput}
+                        onChange={(e) => setLocationValue(e.target.value)}
+                        disabled={!ready}
                         required
                     />
+
+                    {/* Autocomplete dropdown */}
+                    {status === "OK" && (
+                        <ul className="list-group position-absolute w-100" style={{ zIndex: 1000 }}>
+                            {data.map(({ place_id, description }) => (
+                                <li
+                                    key={place_id}
+                                    className="list-group-item list-group-item-action"
+                                    onClick={() => handleSelectLocation(description)}
+                                >
+                                    {description}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </div>
                 <div className="mb-3">
                     <label className="form-label">Date Traveled</label>

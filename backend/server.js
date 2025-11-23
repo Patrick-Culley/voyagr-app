@@ -15,7 +15,10 @@ app.use(express.json());
 
 // allow React frontend to access routes
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+}));
 
 // Routes:
 app.use("/api/users", require("./routes/userRoutes"));
