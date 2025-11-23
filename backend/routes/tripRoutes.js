@@ -10,18 +10,22 @@ const {
     searchTrips
  } = require("../controllers/tripController");
 
+const {verifyToken} = require("../middleware/authHandler.js");
+console.log("verifyToken:", verifyToken);
+
 router.get("/search", searchTrips);
 
 // Routes for CRUD functionality for Trips
 router.route("/")
     .get(getTrips)
-    .post(createTrip);
+    .post(verifyToken, createTrip);
 
 router.route("/:id")
     .get(getTrip)
-    .put(updateTrip)
-    .delete(deleteTrip);
+    .put(verifyToken, updateTrip)
+    .delete(verifyToken, deleteTrip);
 
-router.route("/:tripId/addExperience").post(addExperienceToTrip);
+router.route("/:tripId/addExperience")
+    .post(verifyToken, addExperienceToTrip);
 
 module.exports = router;

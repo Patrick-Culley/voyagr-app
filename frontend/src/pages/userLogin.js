@@ -13,7 +13,9 @@ function UserLogin() {
             const response = await fetch("http://localhost:5555/api/users/login", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({email, password})
+                body: JSON.stringify({email, password}),
+                // allow browser to send cookies
+                credentials: "include"
             });
 
             const data = await response.json();
