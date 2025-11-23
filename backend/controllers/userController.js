@@ -49,6 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
 // public access
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+    console.log("Login Attempt:", email);
     if (!email || !password) {
         res.status(400);
         throw new Error("All fields are mandatory.");
@@ -65,6 +66,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // verify password, retrieves hashed password
     const validPass = await argon2.verify(user.password, password);
+    console.log("Valid password:", validPass);
 
     if (validPass) {
         
