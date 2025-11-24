@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState, } from "react";
+import TripMap from "../components/tripMap";
 
 function TripDetails() {
     const { tripId } = useParams();
@@ -76,6 +77,7 @@ function TripDetails() {
                     <div style={{flexGrow: 1}}>
                         <h2>{trip.trip_name}</h2>
                         <p>{trip.trip_summary}</p>
+                        <TripMap experiences={trip.experiences} />
                     </div>
                     {/* BUTTONS TO NAVIGATE BACK, EDIT, AND DELETE TRIP */}
                     <div className="d-flex justify-content-end mt-3">
