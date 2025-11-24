@@ -69,7 +69,7 @@ function Trips() {
             <div className="row">
             {/* CARD FOR TRIP NAME */}
                 {trips.map((trip) => (
-                    <div className="col-md-4 mb-4" key={trip.user_id}>
+                    <div className="col-md-4 mb-4" key={trip._id}>
                         <div className="card h-100 shadow-sm"
                             style={{ cursor: "pointer" }}
                             onClick={() => navigate(`/trips/${trip._id}`, {state: {trip}})}>
