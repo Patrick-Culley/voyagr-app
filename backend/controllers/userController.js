@@ -1,5 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
+// Helper to generate JWT
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+    });
+};
 
 // Register a user
 // @route POST api/users/register
@@ -28,11 +37,12 @@ const registerUser = asyncHandler(async (req, res) => {
     LATER to implement
     And save hashedPassword for new user
     */
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
         username,
         email,
-        password,
+        password: hashedPassword,
         last_login: new Date()
      });
 
@@ -42,7 +52,8 @@ const registerUser = asyncHandler(async (req, res) => {
             message: "The user is sucessfully registered",
             _id: newUser._id,
             username: newUser.username,
-            email: newUser.email
+            email: newUser.email,
+            token: generateToken(newUser._id),
          });
     } else {
         res.status(400);
@@ -60,27 +71,34 @@ const loginUser = asyncHandler(async (req, res) => {
     };
 
     const user = await User.findOne({ email });
+    if (!user) {
+    return res
+        .status(401)
+        .json({ message: "Email or password is incorrect. Please try again." });
+    }
 
     /* compare hashedPassword with stored in db
     Add function to generate access token
     */
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+    return res
+        .status(401)
+        .json({ message: "Email or password is incorrect. Please try again." });
+    }
 
-    if (user && user.password === password) {
-        console.log("Login is succesful");
-        // update last login
-        user.last_login = new Date();
-        await user.save();
-        res.status(200).json({
-            message: "Login is succesfull",
-            user: {
-                _id: user._id,
-                email: user.email,
-                username: user.username,
-                },
-            });
-    } else {
-        res.status(401).json({message: "Email or password is incorrect. Please try again."})
-    };
+    // Update last login
+    user.last_login = new Date();
+    await user.save();
+
+    res.status(200).json({
+        message: "Login successful",
+        user: {
+            _id: user._id,
+            email: user.email,
+            username: user.username,
+        },
+        token: generateToken(user._id),
+    });
 });
-
 module.exports = { registerUser, loginUser };

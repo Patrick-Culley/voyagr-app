@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const mongoose = require("mongoose");
 const Experience = require("../models/Experience");
+const protect = require("../middleware/authMiddleware");
 
 // get all experiences
 // route GET api/experiences
@@ -21,7 +22,7 @@ const createExperience = asyncHandler (async (req, res) => {
     };
 
     const newExperience = await Experience.create({
-        user_id: req.body.user_id,
+        user_id: req.user._id,
         title,
         date_traveled,
         description,

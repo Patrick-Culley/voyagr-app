@@ -22,6 +22,7 @@ function UserLogin() {
                 alert("You have successfully logged in!");
                 console.log("Success:", data);
 
+                localStorage.setItem("token", data.token);      // JWT 
                 localStorage.setItem("user", JSON.stringify(data.user));
                 window.location.href = "/";
 

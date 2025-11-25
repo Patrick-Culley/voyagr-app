@@ -27,13 +27,17 @@
             try {
                 const user = JSON.parse(localStorage.getItem("user"));
                 const userId = user._id;
-                const response = await fetch(`http://localhost:5555/api/trips?user_id=${userId}`);
+                const response = await fetch(`http://localhost:5555/api/trips`, {
+                     headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
                 const data = await response.json();
                 setTrips(data);
             } catch (error) {
                 console.error("Error fetching trips.", error);
             }
-        };
+        };  
         fetchTrips();
     }, []);
 
@@ -47,7 +51,10 @@
         try {
             const response = await fetch(`http://localhost:5555/api/trips/${selectedTrip}/addExperience`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json", 
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
                 body: JSON.stringify({ experience_id: experience._id }),
             });
             if (!response.ok) throw new Error("Failed to save experience.");
