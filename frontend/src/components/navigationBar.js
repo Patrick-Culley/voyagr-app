@@ -19,7 +19,11 @@ function NavigationBar() {
         return () => window.removeEventListener("storage", handleStorageChange);
     }, []);
 
+    {/* HANDLES LOGOUT FUNCTION */}
     const handleLogout = () => {
+        const confirmLogout = window.confirm("Are you sure you want to log out?");
+        if (!confirmLogout) return;
+
         localStorage.removeItem("user");
         setUser(null);
         navigate("/");
@@ -82,6 +86,10 @@ function NavigationBar() {
         )}
         {user && (
             <div className="navbar-nav ms-auto">
+            {/* DISPLAY USERNAME WHEN LOGGED IN */}
+            <li className="nav-item me-3">
+                <span className="nav-link" disabled>Hello, <strong>{user.username}</strong></span>
+            </li>
             {/* LOGOUT */}
             <li className="nav-item">
                 <button className="nav-link"
