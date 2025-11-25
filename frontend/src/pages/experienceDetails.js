@@ -74,7 +74,7 @@
         try {
             const response = await fetch(`http://localhost:5555/api/ratings/${experience._id}`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json"},
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${user.token}`},
                 body: JSON.stringify({ score} ),
             });
             if (!response.ok) throw new Error("Failed to submit rating.");
@@ -114,7 +114,7 @@
                         />
                     )}
                     {/* CREATED AT DATETIME */}
-                    <h6>Posted: {new Date(experience.created_at).toLocaleString(undefined, {
+                    <h6>Posted<strong>{experience.user_id?.username}</strong>: {new Date(experience.created_at).toLocaleString(undefined, {
                         year: "numeric",
                         month: "long",
                         day: "numeric",

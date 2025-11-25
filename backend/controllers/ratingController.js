@@ -25,7 +25,7 @@ const addRating = asyncHandler (async (req, res) => {
     otherwise, it will create new Rating from the user to that experience
     */
     const findRating = await Rating.findOne({
-        user_id: req.user_id,
+        user_id: "69120ab03cd24d3d39f9b154", // hardcoded for now
         experience_id: experienceId
     });
 
@@ -33,7 +33,7 @@ const addRating = asyncHandler (async (req, res) => {
     if (!findRating){
         newRating = await Rating.create({
         experience_id: experienceId,
-        user_id : req.user_id,
+        user_id : "69120ab03cd24d3d39f9b154", // hardcoded for now
         score,
         review
     });
