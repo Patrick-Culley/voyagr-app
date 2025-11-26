@@ -27,7 +27,6 @@ function App() {
         <Route path="/experiences" element={<ExperiencesPage/>} />
         <Route path="/add-experience" element={<AddExperience/>} />
         <Route path="/experiences/:experienceId" element={<ExperienceDetails/>} />
-        <Route path="/login" element={<UserLogin/>} />
         <Route path="/search" element={<SearchResults />} />
       </Routes>
     </Router>

@@ -31,7 +31,19 @@ const userSchema = new mongoose.Schema(
         last_login: {
             type: Date,
             required: true
-        }
+        },
+        tokens: [
+            {
+                token: {
+                 type: String,
+                 required: true
+                },
+                signedAt: {
+                    type: String,
+                    required: true
+                }
+            }
+        ]
     },
     { collection: "Users"}
 )

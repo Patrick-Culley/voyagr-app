@@ -20,11 +20,6 @@ const ratingSchema = new mongoose.Schema(
             min: 1,
             max: 10,
         },
-
-        review: {
-            type: String,
-            maxlength: 500,
-        },
     },
     {
         collection: "Ratings",

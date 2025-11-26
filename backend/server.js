@@ -1,10 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
 const cors = require("cors");
-const path = require("path");
 const connectDb = require("./config/dbConnection");
 const errorHandler = require("./middleware/errorHandler");
-const cookieParser = require("cookie-parser");
 
 connectDb();
 const app = express();
@@ -20,13 +18,6 @@ app.use(cors({
     origin: "http://localhost:3000",
     credentials: true
  }));
-
-// helps parse httpOnly cookies, required for authentication using JWT
-app.use(cookieParser());
-app.use(cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-}));
 
 // Routes:
 app.use("/api/users", require("./routes/userRoutes"));

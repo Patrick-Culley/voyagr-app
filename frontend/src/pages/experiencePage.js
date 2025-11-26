@@ -6,6 +6,8 @@ function ExperiencesPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const user = JSON.parse(localStorage.getItem("user"));
+
     useEffect(() => {
         const fetchExperiences = async () => {
             try {
@@ -48,7 +50,8 @@ function ExperiencesPage() {
                         </div>
                     </div>
                 ))}
-                <div className="col-md-4 mb-4">
+                {user && (
+                    <div className="col-md-4 mb-4">
                     <div
                         className="card shadow-sm h-100 d-flex align-items-center justify-content-center"
                         style={{cursor: "pointer", fontSize: "2rem" }}
@@ -57,6 +60,7 @@ function ExperiencesPage() {
                         <span>+</span>
                     </div>
                 </div>
+                )}
             </div>
         </div>
     )
