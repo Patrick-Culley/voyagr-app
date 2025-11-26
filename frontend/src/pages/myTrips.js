@@ -49,6 +49,7 @@ function Trips() {
                     "Authorization": `Bearer ${localStorage.getItem("token")}`
                  },
                 body: JSON.stringify(newTrip),
+                credentials: "include"
             });
 
             const data = await response.json();

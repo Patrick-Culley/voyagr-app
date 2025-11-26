@@ -11,6 +11,9 @@ const {
     searchTrips
  } = require("../controllers/tripController");
 
+const {verifyToken} = require("../middleware/authHandler.js");
+console.log("verifyToken:", verifyToken);
+
 router.get("/search", searchTrips);
 
 // Routes for CRUD functionality for Trips

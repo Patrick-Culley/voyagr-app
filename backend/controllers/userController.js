@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
     console.log(`User created: ${newUser}`);
     if (newUser) {
         res.status(201).json({
-            message: "The user is sucessfully registered",
+            message: "The user is successfully registered!",
             _id: newUser._id,
             username: newUser.username,
             email: newUser.email,
@@ -66,8 +66,11 @@ const registerUser = asyncHandler(async (req, res) => {
 // public access
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
+    console.log("Login Attempt:", email);
     if (!email || !password) {
-        res.status(400).json({message: "All fields are mandatory."})
+        res.status(400);
+        throw new Error("All fields are mandatory.");
+        // res.status(400).json({message: "All fields are mandatory."})
     };
 
     const user = await User.findOne({ email });
