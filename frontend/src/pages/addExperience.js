@@ -1,8 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 import React, { useState } from "react";
+import usePlacesAutocomplete, { getGeocode, getLatLng } from "use-places-autocomplete";
+import useLoadGoogleMaps from "../hooks/useLoadGoogleMaps";
 
 function AddExperience() {
-    const {tripId} = useParams();
+    const loaded = useLoadGoogleMaps();    
+    const { tripId } = useParams();
     const navigate = useNavigate();
 
     const [title, setTitle] = useState("");
@@ -12,27 +15,72 @@ function AddExperience() {
     const [dateTraveled, setDateTraveled] = useState("");
     const [keywords, setKeywords] = useState("");
     const [visibility, setVisibility] = useState("public");
+    const [coords, setCoords] = useState({ lat: null, lng: null });
 
-    {/* HANDLE FORM SUBMISSION FOR ADDING AN EXPERIENCE */}
+    // Call usePlacesAutocomplete  
+    const {
+        ready,
+        value: locationInput,
+        suggestions: { status, data },
+        setValue: setLocationValue,
+        clearSuggestions
+    } = usePlacesAutocomplete({
+        debounce: 300,
+        requestOptions: {},
+    });
+
+    // check if loaded after all hooks 
+    if (!loaded) {
+        return (
+            <div className="container mt-4">
+                <p>Loading Google Maps...</p>
+            </div>
+        );
+    }
+
+    const handleSelectLocation = async (address) => {        
+        setLocationValue(address, false);
+        clearSuggestions();
+        setLocation(address);
+
+        try {
+            const results = await getGeocode({ address });            
+            const { lat, lng } = await getLatLng(results[0]);
+            
+            setCoords({ lat, lng });
+        } catch (error) {
+            console.error("Error getting location coordinates:", error);
+            alert("Could not get coordinates for this location. Please try another.");
+        }
+    };
+
     const handleAddExperience = async (event) => {
         event.preventDefault();
+        console.log("Form submitted!");
 
         const user = JSON.parse(localStorage.getItem("user"));
         if (!user) {
-            console.error("No user found in localStorage.");
             alert("You must be logged in to add an experience.");
+            return;
+        }
+
+        // Check if coordinates are set
+        if (!coords.lat || !coords.lng) {
+            alert("Please select a location from the dropdown suggestions.");
             return;
         }
 
         const newExperience = {
             user_id: user._id,
-            title: title,
-            description: description,
-            location: {name: location, coordinates: [0, 0]},    // placeholder coordinates
+            title,
+            description,
+            location: { name: location, coordinates: [coords.lng, coords.lat] },
             date_traveled: dateTraveled,
             keywords: keywords ? keywords.split(",").map(k => k.trim()) : [],
-            visibility: visibility,
+            visibility,
         };
+
+        console.log("Sending experience:", newExperience);
 
         try {
             const response = await fetch("http://localhost:5555/api/experiences", {
@@ -44,56 +92,40 @@ function AddExperience() {
             const data = await response.json();
 
             if (!response.ok) {
-                console.error("Error creating experience:", data);
                 alert(data.message || `Error creating experience: ${response.status}`);
                 return;
             }
 
             const experienceId = data.newExperience._id;
 
-            if (!experienceId) {
-                console.error("No experience ID returned from backend!");
-                alert("Experience created but something went wrong with ID.");
-                return;
+            if (imageFile) {
+                const formData = new FormData();
+                formData.append("image", imageFile);
+                formData.append("user_id", user._id);
+
+                const uploadResponse = await fetch(`http://localhost:5555/api/upload/${experienceId}`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                console.log("Image upload status:", uploadResponse.status);
             }
 
-            if (response.ok) {
-                if (imageFile) {
-                    console.log("Uploading image for experience:", experienceId);
-                    const formData = new FormData();
-                    formData.append("image", imageFile);
-                    formData.append("user_id", user._id);
+            alert("Experience added!");
+            navigate(`/experiences`, { state: { refresh: true } });
 
-                    const imageRes = await fetch (`http://localhost:5555/api/upload/${experienceId}`, {
-                        method: "POST",
-                        body: formData,
-                    });
-
-                    const imageData = await imageRes.json();
-                    console.log("Image upload response:", imageData);
-
-                    if (!imageRes.ok) {
-                        console.error("Image upload failed:", imageData);
-                        alert("Experience created, but image upload failed.");
-                    }
-                }
-                alert("Experience added!");
-                navigate(`/experiences`, {state: {refresh:true}});
-            } else {
-                alert(data.message || `Error creating experience: ${response.status}`);
-            }
         } catch (error) {
-            console.error("Error adding experience", error);
+            console.error("Error adding experience:", error);
+            alert(`Error: ${error.message}`);
         }
     };
 
-    {/* FORM FOR ADDING AN EXPERIENCE */}
     return (
         <div className="container mt-4">
             <h2>Add an experience</h2>
             <form onSubmit={handleAddExperience} className="card p-3 shadow">
                 <div className="mb-3">
-                    <label className="form-label">Name</label>
+                    <label className="form-label">Title:</label>
                     <input
                         type="text"
                         className="form-control"
@@ -102,47 +134,80 @@ function AddExperience() {
                         required
                     />
                 </div>
+
                 <div className="mb-3">
-                    <label className="form-label">Description</label>
+                    <label className="form-label">Description:</label>
                     <textarea
-                        placeholder="How did it go?"
-                        rows="3"
                         className="form-control"
+                        rows="3"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label">Location</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
                         required
                     />
                 </div>
+
                 <div className="mb-3">
-                    <label className="form-label">Date Traveled</label>
+                    <label className="form-label">Location:</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        value={locationInput}
+                        onChange={(e) => setLocationValue(e.target.value)}
+                        disabled={!ready}
+                        placeholder="Search for a location..."
+                    />
+                    {status === "OK" && (
+                        <ul className="list-group mt-2">
+                            {data.map((suggestion) => {
+                                const {
+                                    place_id,
+                                    structured_formatting: { main_text, secondary_text },
+                                } = suggestion;
+
+                                return (
+                                    <li
+                                        key={place_id}
+                                        className="list-group-item list-group-item-action"
+                                        onClick={() => handleSelectLocation(suggestion.description)}
+                                        style={{ cursor: "pointer" }}
+                                    >
+                                        <strong>{main_text}</strong> <small>{secondary_text}</small>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                    {location && (
+                        <small className="text-success d-block mt-1">
+                            ✓ Selected: {location}
+                        </small>
+                    )}
+                </div>
+
+                <div className="mb-3">
+                    <label className="form-label">Date Traveled:</label>
                     <input
                         type="date"
                         className="form-control"
                         value={dateTraveled}
                         onChange={(e) => setDateTraveled(e.target.value)}
+                        required
                     />
                 </div>
+
                 <div className="mb-3">
-                    <label className="form-label">Keywords</label>
+                    <label className="form-label">Keywords (comma-separated):</label>
                     <input
-                        placeholder="Optional"
                         type="text"
                         className="form-control"
                         value={keywords}
                         onChange={(e) => setKeywords(e.target.value)}
+                        placeholder="beach, sunset, adventure"
                     />
                 </div>
+
                 <div className="mb-3">
-                    <label className="form-label">Image</label>
+                    <label className="form-label">Image:</label>
                     <input
                         type="file"
                         className="form-control"
@@ -150,21 +215,23 @@ function AddExperience() {
                         onChange={(e) => setImageFile(e.target.files[0])}
                     />
                 </div>
+
                 <div className="mb-3">
-                    <label className="form-label">Visibility</label>
+                    <label className="form-label">Visibility:</label>
                     <select
                         className="form-select"
                         value={visibility}
                         onChange={(e) => setVisibility(e.target.value)}
-                        >
-                            <option value="public">Public</option>
-                            <option value="private">Private</option>
+                    >
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
                     </select>
                 </div>
-                <button type="submit" className="btn btn-primary">Let's go!</button>
+
+                <button type="submit" className="btn btn-primary">Add Experience</button>
             </form>
         </div>
-    )
+    );
 }
 
 export default AddExperience;

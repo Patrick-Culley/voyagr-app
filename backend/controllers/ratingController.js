@@ -9,7 +9,7 @@ const Experience = require("../models/Experience");
 const addRating = asyncHandler (async (req, res) => {
     const { experienceId } = req.params;
     const { score, review } = req.body;
-    
+
     // Validate experienceId
     const validExperience = await Experience.findById(experienceId);
     if (!validExperience){
@@ -24,8 +24,8 @@ const addRating = asyncHandler (async (req, res) => {
     If the user already added the rating, it will update existing Rating,
     otherwise, it will create new Rating from the user to that experience
     */
-    const findRating = await Rating.findOne({ 
-        user_id: "69120ab03cd24d3d39f9b154",
+    const findRating = await Rating.findOne({
+        user_id: "69120ab03cd24d3d39f9b154", // hardcoded for now
         experience_id: experienceId
     });
 
@@ -47,7 +47,7 @@ const addRating = asyncHandler (async (req, res) => {
 
     // await newRating.save();
 
-    // Do the average Rating calculations using aggregate 
+    // Do the average Rating calculations using aggregate
     const totalAvg = await Rating.aggregate([
         {$match: {
             experience_id: new mongoose.Types.ObjectId(experienceId)
@@ -64,12 +64,12 @@ const addRating = asyncHandler (async (req, res) => {
     await Experience.findByIdAndUpdate(experienceId, {averageRating: average});
 
     console.log(`New Rating was added.\nFor ${validExperience.title} average rating is updated.`);
-    res.status(201).json({ 
-        message: "Rating is added", 
-        experience: validExperience.title, 
+    res.status(201).json({
+        message: "Rating is added",
+        experience: validExperience.title,
         experienceId: validExperience.id,
-        user_id: newRating.user_id, 
-        rating: newRating.score, 
+        user_id: newRating.user_id,
+        rating: newRating.score,
         averageRating: average});
 });
 
