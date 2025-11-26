@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const connectDb = require("./config/dbConnection");
 const errorHandler = require("./middleware/errorHandler");
+const cookieParser = require("cookie-parser");
 
 connectDb();
 const app = express();
@@ -14,7 +15,14 @@ const port = process.env.PORT
 app.use(express.json());
 
 // allow React frontend to access routes
+// allow frontend to send httpOnly cookies
+app.use(cors({ 
+    origin: "http://localhost:3000",
+    credentials: true
+ }));
 
+// helps parse httpOnly cookies, required for authentication using JWT
+app.use(cookieParser());
 app.use(cors({
     origin: "http://localhost:3000",
     credentials: true,

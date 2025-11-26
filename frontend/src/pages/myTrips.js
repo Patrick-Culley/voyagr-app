@@ -15,7 +15,9 @@ function Trips() {
             const user = JSON.parse(localStorage.getItem("user"));
             if (!user || !user._id) return;
             try {
-                const response = await fetch(`http://localhost:5555/api/trips?user_id=${user._id}`);
+                const response = await fetch(`http://localhost:5555/api/trips?user_id=${user._id}`, {
+                    credentials: "include"
+                });
                 const data = await response.json();
                 setTrips(data);
             } catch (error) {
@@ -46,6 +48,7 @@ function Trips() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newTrip),
+                credentials: "include"
             });
 
             const data = await response.json();
