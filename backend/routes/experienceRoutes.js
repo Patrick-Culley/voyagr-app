@@ -1,3 +1,4 @@
+const protect = require("../middleware/authMiddleware");
 const express = require("express");
 const {
     getExperiences,
@@ -10,7 +11,7 @@ const router = express.Router();
 
 router.route("/")
     .get(getExperiences)
-    .post(createExperience);
+    .post(protect, createExperience);
 
 router.route("/search").get(searchExperiences);
 

@@ -15,7 +15,11 @@ function TripDetails() {
     useEffect(() => {
         const fetchTrips = async() => {
             try {
-                const response = await fetch(`http://localhost:5555/api/trips/${tripId}`);
+                const response = await fetch(`http://localhost:5555/api/trips/${tripId}`, { 
+                    headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
                 const data = await response.json();
                 setTrip(data);
 
@@ -34,7 +38,10 @@ function TripDetails() {
 
         const response = await fetch(`http://localhost:5555/api/trips/${tripId}`, {
             method: "PUT",
-            headers: {"Content-Type": "application/json"},
+            headers: {
+                "Content-Type": "application/json", 
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
             body: JSON.stringify({
                 trip_name: editName,
                 trip_summary: editSummary,
@@ -58,6 +65,9 @@ function TripDetails() {
 
         const response = await fetch(`http://localhost:5555/api/trips/${tripId}`, {
             method: "DELETE",
+                headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
         });
 
         if (response.ok) {

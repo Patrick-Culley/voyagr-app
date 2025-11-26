@@ -5,14 +5,14 @@ const Trip = require("../models/Trip");
 // @route POST api/trips
 // @access private
 const createTrip = asyncHandler (async (req, res) => {
-    const { user_id, trip_name, trip_summary } = req.body;
+    const {trip_name, trip_summary } = req.body;
     if (!trip_name) {
         res.status(400);
         throw new Error("Title is mandatory");
     }
 
     const newTrip = await Trip.create({
-        user_id,
+        user_id: req.user._id,
         trip_name,
         trip_summary
     });
@@ -24,13 +24,7 @@ const createTrip = asyncHandler (async (req, res) => {
 // @route GET api/trips
 // access private
 const getTrips = asyncHandler(async (req, res) => {
-    const { user_id } = req.query;
-
-    if (!user_id) {
-        return res.status(400).json({ message: "user_id is required" });
-    }
-
-    const trips = await Trip.find({ user_id });
+    const trips = await Trip.find({ user_id: req.user._id });
     res.status(200).json(trips);
 });
 
@@ -46,6 +40,11 @@ const getTrip = asyncHandler (async (req, res) => {
         res.status(404);
         throw new Error("Trip not found");
     };
+
+    if (trip.user_id.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not authorized to view this trip" });
+    }
+
     res.status(200).json(trip);
 });
 
@@ -60,10 +59,9 @@ const updateTrip = asyncHandler (async (req, res) => {
         throw new Error("Trip no found");
     };
 
-    // if (User.user_id.toString() !== req.user_id) {
-    //     res.status(400);
-    //     throw new Error("You don't have permission to edit other trips");
-    // };
+    if (trip.user_id.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not authorized to update this trip" });
+    }
 
     const updatedTrip = await Trip.findByIdAndUpdate(
         req.params.id,
@@ -85,10 +83,9 @@ const deleteTrip = asyncHandler (async (req, res) => {
         throw new Error("Trip no found");
     };
 
-    // if (User.user_id.toString() !== req.user_id) {
-    //     res.status(400);
-    //     throw new Error("You don't have permission to delete other trips");
-    // };
+    if (trip.user_id.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not authorized to delete this trip" });
+    }
 
     const deletedTrip = await Trip.deleteOne({ _id: req.params.id });
     res.status(200).json(deletedTrip);
@@ -109,6 +106,10 @@ const addExperienceToTrip = asyncHandler (async (req, res) => {
     if (!trip) {
         return res.status(404).json({ message: "Trip not found"});
     };
+
+    if (trip.user_id.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: "Not authorized to modify this trip" });
+    }
 
     // Check if the experience was already added
     if (!trip.experiences.some(result => result.toString() === experience_id)) {
@@ -134,6 +135,7 @@ const searchTrips = asyncHandler(async (req, res) => {
     const regex = new RegExp(q, "i"); // case-insensitive match
 
     const trips = await Trip.find({
+        user_id: req.user._id,   // <-- important
         $or: [
             { trip_name: { $regex: regex } },
             { trip_summary: { $regex: regex } }

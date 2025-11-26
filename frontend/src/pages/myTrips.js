@@ -12,11 +12,11 @@ function Trips() {
     {/* LOAD TRIP DATA FROM BACKEND */}
     useEffect(() => {
         const fetchTrips = async() => {
-            const user = JSON.parse(localStorage.getItem("user"));
-            if (!user || !user._id) return;
             try {
-                const response = await fetch(`http://localhost:5555/api/trips?user_id=${user._id}`, {
-                    credentials: "include"
+                const response = await fetch(`http://localhost:5555/api/trips`, {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`
+                    }
                 });
                 const data = await response.json();
                 setTrips(data);
@@ -31,14 +31,12 @@ function Trips() {
     const handleAddTrip = async (event) => {
         event.preventDefault();
 
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (!user) {
-            alert("You must be logged in to add a trip.");
+        if (!localStorage.getItem("token")) {
+            alert("You must be logged in.");
             return;
         }
 
         const newTrip = {
-            user_id: user._id,
             trip_name: name,
             trip_summary: summary,
         };
@@ -46,7 +44,10 @@ function Trips() {
         try {
             const response = await fetch("http://localhost:5555/api/trips", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                 },
                 body: JSON.stringify(newTrip),
                 credentials: "include"
             });

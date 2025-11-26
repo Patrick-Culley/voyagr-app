@@ -1,7 +1,14 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
-const argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
+// Helper to generate JWT
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: "30d",
+    });
+};
 
 // Register a user
 // @route POST api/users/register
@@ -25,12 +32,17 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "The password should have at least 8 characters, 1 number and 1 upper case letter"});
     };
 
-    const passHash = await argon2.hash(password)
+    /*
+    function to hash password
+    LATER to implement
+    And save hashedPassword for new user
+    */
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
         username,
         email,
-        password: passHash,
+        password: hashedPassword,
         last_login: new Date()
      });
 
@@ -40,7 +52,8 @@ const registerUser = asyncHandler(async (req, res) => {
             message: "The user is successfully registered!",
             _id: newUser._id,
             username: newUser.username,
-            email: newUser.email
+            email: newUser.email,
+            token: generateToken(newUser._id),
          });
     } else {
         res.status(400);
@@ -61,69 +74,34 @@ const loginUser = asyncHandler(async (req, res) => {
     };
 
     const user = await User.findOne({ email });
-
-     // invalid login info check
     if (!user) {
-        res.status(401);
-        throw new Error("Invalid email/username or password.");
-    };
-
-    // verify password, retrieves hashed password
-    const validPass = await argon2.verify(user.password, password);
-    console.log("Valid password:", validPass);
-
-    if (validPass) {
-        
-        // token creation for secure login
-        const token = jwt.sign({
-            userId: user._id},
-            process.env.JWT_SECRET,
-            {expiresIn: "15m"}
-        );
-        
-        // authentication token
-        // http only where JS cant access cookie
-        // secure only sends cookies over HTTPS in production
-        // samesite controls cross site requests
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: false,
-            sameSite: "lax",
-            maxAge: 15 * 60 * 1000,
-        });
-        console.log("Login is successful");
-
-        // update last login
-        user.last_login = new Date();
-        await user.save();
-
-        res.status(200).json({
-            message: "Login is successful",
-            user: {
-                _id: user._id,
-                email: user.email,
-                username: user.username,
-                },
-            });
-    } else {
-        res.status(401);
-        throw new Error("Email or password is not correct.");
-        // res.status(401).json({
-        //     message: "Email or password is incorrect. Please try again."
-        // });
+    return res
+        .status(401)
+        .json({ message: "Email or password is incorrect. Please try again." });
     }
-});
 
-// logs out user
-// POST api/users/logout
-const logoutUser = asyncHandler(async (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+    /* compare hashedPassword with stored in db
+    Add function to generate access token
+    */
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+    return res
+        .status(401)
+        .json({ message: "Email or password is incorrect. Please try again." });
+    }
+
+    // Update last login
+    user.last_login = new Date();
+    await user.save();
+
+    res.status(200).json({
+        message: "Login successful",
+        user: {
+            _id: user._id,
+            email: user.email,
+            username: user.username,
+        },
+        token: generateToken(user._id),
     });
-    res.json({message: "Successfully logged out user."});
 });
-
-
-module.exports = { registerUser, loginUser, logoutUser };
+module.exports = { registerUser, loginUser };
