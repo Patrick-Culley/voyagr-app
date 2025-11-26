@@ -32,11 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
         return res.status(400).json({ message: "The password should have at least 8 characters, 1 number and 1 upper case letter"});
     };
 
-    /*
-    function to hash password
-    LATER to implement
-    And save hashedPassword for new user
-    */
+    // password hashing
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
@@ -46,7 +42,17 @@ const registerUser = asyncHandler(async (req, res) => {
         last_login: new Date()
      });
 
-    console.log(`User created: ${newUser}`);
+    console.log("User is successfully registered: ", newUser.username);
+
+    // Save token on register 
+    const token = generateToken(newUser._id);
+    
+    newUser.tokens = [{
+        token,
+        signedAt: Date.now().toString()
+    }]
+    await newUser.save();
+
     if (newUser) {
         res.status(201).json({
             message: "The user is successfully registered!",
@@ -66,11 +72,9 @@ const registerUser = asyncHandler(async (req, res) => {
 // public access
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    console.log("Login Attempt:", email);
     if (!email || !password) {
         res.status(400);
         throw new Error("All fields are mandatory.");
-        // res.status(400).json({message: "All fields are mandatory."})
     };
 
     const user = await User.findOne({ email });
@@ -81,7 +85,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     /* compare hashedPassword with stored in db
-    Add function to generate access token
+    and generate token
     */
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
@@ -92,6 +96,16 @@ const loginUser = asyncHandler(async (req, res) => {
 
     // Update last login
     user.last_login = new Date();
+
+    // Save  on login
+    const token = generateToken(user._id);
+    
+    const newTokens = user.tokens || [];
+    newTokens.push({
+        token,
+        signedAt: Date.now().toString()
+    })
+    user.tokens = newTokens;
     await user.save();
 
     res.status(200).json({
@@ -101,7 +115,38 @@ const loginUser = asyncHandler(async (req, res) => {
             email: user.email,
             username: user.username,
         },
-        token: generateToken(user._id),
+        token: token,
     });
+    console.log("Login is successful for user: ", user.username);
 });
-module.exports = { registerUser, loginUser };
+
+// logout user
+// @route api/users/logout
+// private access
+const logoutUser = asyncHandler (async (req, res) => {
+    if (!req.user || !req.user.tokens) {
+        return res.status(401).json({ message: "User data not found from token"})
+    }
+
+    // retrieve token from header
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ message: "Token not provided."});
+    }
+
+    const tokens = req.user.tokens;
+
+    const newTokens = tokens.filter(t => t.token !== token);
+
+    try {
+        await req.user.save();
+        
+        console.log("User is successfully signed out."); 
+        res.status(200).json({ message: "Sign out is successful."});
+
+    } catch (dbError) {
+        console.error("LOGOUT FAILED: Database update error:", dbError); 
+        res.status(500).json({ message: "Logout failed due to server error." });
+    }
+})
+module.exports = { registerUser, loginUser, logoutUser };
