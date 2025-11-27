@@ -8,7 +8,7 @@ const Experience = require("../models/Experience");
 // private access
 const addRating = asyncHandler (async (req, res) => {
     const { experienceId } = req.params;
-    const { score, review } = req.body;
+    const { score } = req.body;
 
     // Validate experienceId
     const validExperience = await Experience.findById(experienceId);
@@ -25,7 +25,7 @@ const addRating = asyncHandler (async (req, res) => {
     otherwise, it will create new Rating from the user to that experience
     */
     const findRating = await Rating.findOne({
-        user_id: "69120ab03cd24d3d39f9b154", // hardcoded for now
+        user_id: req.user._id,
         experience_id: experienceId
     });
 
@@ -33,9 +33,8 @@ const addRating = asyncHandler (async (req, res) => {
     if (!findRating){
         newRating = await Rating.create({
         experience_id: experienceId,
-        user_id : "69120ab03cd24d3d39f9b154", // hardcoded for now
-        score,
-        review
+        user_id : req.user._id,
+        score
     });
     } else {
         newRating = await Rating.findByIdAndUpdate(

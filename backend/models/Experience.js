@@ -17,7 +17,6 @@ const experienceSchema = new mongoose.Schema(
 
         description: {
             type: String,
-            maxlength: 200,
             trim: true,
         },
 

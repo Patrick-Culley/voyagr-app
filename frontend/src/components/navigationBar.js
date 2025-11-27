@@ -20,13 +20,45 @@ function NavigationBar() {
     }, []);
 
     {/* HANDLES LOGOUT FUNCTION */}
-    const handleLogout = () => {
+    const handleLogout = async () => {
         const confirmLogout = window.confirm("Are you sure you want to log out?");
         if (!confirmLogout) return;
 
-        localStorage.removeItem("user");
-        setUser(null);
-        navigate("/");
+        // Get the token from local storage
+        const token = localStorage.getItem("token");
+        
+        if (!token) {
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            setUser(null);
+            navigate("/");
+            return;
+        }
+
+        // send request to log out to backend
+        try {
+            const response = await fetch("http://localhost:5555/api/users/logout", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            if (response.ok) {
+                console.log("User sign out in backend is successful.");
+
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                setUser(null);
+                navigate("/");
+            } else {
+                const errorData = await response.json();
+                console.error("Backend logout failed:", errorData.message);
+            }
+        } catch (error) {
+            console.error("Error during user logout:", error);
+        }
+
     }
 
     // SEARCH SUBMIT HANDLER

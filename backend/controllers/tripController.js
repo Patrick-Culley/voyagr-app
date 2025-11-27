@@ -89,7 +89,7 @@ const deleteTrip = asyncHandler (async (req, res) => {
 
     const deletedTrip = await Trip.deleteOne({ _id: req.params.id });
     res.status(200).json(deletedTrip);
-    console.log("The trip was deleted");
+    console.log("The trip was deleted.");
 });
 
 // add experience to a trip

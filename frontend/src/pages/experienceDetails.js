@@ -78,10 +78,12 @@
         e.preventDefault();
         if (!user) return alert ("You must be logged in to rate an experience.")
 
+        const token = localStorage.getItem('token');
+
         try {
             const response = await fetch(`http://localhost:5555/api/ratings/${experience._id}`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${user.token}`},
+                headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}`},
                 body: JSON.stringify({ score} ),
             });
             if (!response.ok) throw new Error("Failed to submit rating.");
@@ -133,8 +135,9 @@
                     <p>{experience.description}</p>
                 </div>
                 {/* KEYWORDS AND BUTTONS TO RATE AND SAVE */}
-                <div className="d-flex justify-content-between align-items-center mt-3">
+                    <div className="d-flex justify-content-between align-items-center mt-3">
                     <p className="mb-0 text-wrap">Keywords: {experience.keywords?.join(", ")}</p>
+                    {user && (
                     <div className="d-flex gap-2">
                         <button
                             className="btn btn-secondary"
@@ -148,8 +151,9 @@
                         >
                             <i className="bi bi-bookmark-plus-fill"></i>
                         </button>
+                        </div>
+                        )}
                     </div>
-                </div>
             </div>
             {/* DISPLAY SAVE TO MY TRIP MODAL */}
             {showModal&& (
