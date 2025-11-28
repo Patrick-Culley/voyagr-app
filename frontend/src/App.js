@@ -9,6 +9,7 @@ import SearchResults from "./pages/SearchResults";
 import AddExperience from "./pages/addExperience";
 import ExperiencesPage from "./pages/experiencePage";
 import ExperienceDetails from "./pages/experienceDetails";
+import HomePage from "./pages/homePage";
 
 
 function App() {
@@ -19,7 +20,7 @@ function App() {
 
       {/* PAGES */}
       <Routes>
-        {/* <Route path="/" element={<Home/>} /> */}
+        <Route path="/" element={<HomePage/>} />
         <Route path="/register" element={<UserRegistration/>} />
         <Route path="/login" element={<UserLogin/>} />
         <Route path="/trips" element={<Trips/>} />
