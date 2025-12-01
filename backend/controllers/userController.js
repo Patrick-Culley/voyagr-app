@@ -135,10 +135,12 @@ const logoutUser = asyncHandler (async (req, res) => {
     }
 
     const tokens = req.user.tokens;
-
     const newTokens = tokens.filter(t => t.token !== token);
 
     try {
+        // update valid tokens in User schema
+        req.user.tokens = newTokens;
+
         await req.user.save();
         
         console.log("User is successfully signed out."); 
